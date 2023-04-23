@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Books_Ko</string>
+    <!--  앱제목  -->
+    <string name="app_title">Books</string>
+    <!--  서버주소 -->
+    <string name="server_url">https://appbook.dosymmm.ga/</string>
 </resources>

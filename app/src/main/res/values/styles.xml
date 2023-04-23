@@ -8,4 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!--  제목 텍스트뷰 : 가운데 정렬, 글자 크게   -->
+    <style name = "TITLE_STYLE">
+        <item name = "android:textSize">30sp</item>
+        <item name = "android:textColor">@color/colorPrimary</item>
+        <item name = "android:layout_gravity">center_horizontal</item>
+    </style>
+
 </resources>
