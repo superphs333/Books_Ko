@@ -3,5 +3,5 @@
     <!--  앱제목  -->
     <string name="app_title">Books</string>
     <!--  서버주소 -->
-    <string name="server_url">https://appbook.dosymmm.ga/</string>
+    <string name="server_url">https://books.dosymmm.ga/</string>
 </resources>

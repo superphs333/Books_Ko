@@ -61,7 +61,7 @@ object AboutMember{
                     val jsonError = String(networkResponse.data)
                     Log.d("정보태그", "onErrorResponse: $jsonError")
                 }
-                Log.d("정보태그","error=>"+error.getMessage());
+
             }
         ) {
             // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
