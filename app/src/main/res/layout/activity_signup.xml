@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10sp"
+    tools:context=".Activity_Signup">
+
+    <!-- 회원가입 -->
+    <TextView
+        android:id="@+id/txt_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/TITLE_STYLE"
+        android:text="회원가입" />
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <!-- 이메일   -->
+            <TextView
+                android:id="@+id/EAMIL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="이메일"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edit_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName" />
+
+            <Button
+                android:id="@+id/btn_email_chk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="send_email"
+                android:text="중복체크 및 인증문자 전송" />
+
+            <EditText
+                android:id="@+id/edit_email_chk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="이메일로 받은 인증문자를 입력해주세요"
+                android:layout_marginBottom="20sp"
+                android:inputType="textPersonName" />
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/textView"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_weight="1"-->
+            <!--                android:layout_marginBottom="20sp"-->
+            <!--                android:text="중복체크 후에 이메일을 변경하면 인증문자가 초기화 되어 다시 중복체크" />-->
+
+            <!-- 비밀번호   -->
+            <TextView
+                android:id="@+id/PW"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="비밀번호(대소문자 구분 숫자 특수문자  조합 9 ~ 12 자리)"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edit_pw"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName" />
+
+            <TextView
+                android:id="@+id/txt_pw_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="비밀번호 적합성 문구"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edit_pw_double"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="비밀번호를 한  번 더 입력해주세요"
+                android:inputType="textPersonName" />
+
+            <TextView
+                android:id="@+id/txt_pw_double_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20sp"
+                android:text="비밀번호 일치 확인 문구" />
+
+
+            <!-- 닉네임   -->
+            <TextView
+                android:id="@+id/NICKNAME"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="닉네임(영문, 숫자로만 이루어진 4~12자 문자)"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edit_nick"
+                    android:layout_width="0dp"
+                    android:layout_weight="6"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="textPersonName" />
+
+                <Button
+                    android:id="@+id/btn_nick_chk"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:onClick="Check_Nick_Double"
+                    android:text="중복확인" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txt_nick_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20sp"
+                android:text="중복확인 문구" />
+
+
+
+            <!-- 프로필   -->
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="프로필 사진"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_camera"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:onClick="camera_for_profile"
+                        android:text="카메라" />
+
+                    <Button
+                        android:id="@+id/btn_gallery"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:onClick="gallery_for_profile"
+                        android:text="갤러리" />
+
+                    <Button
+                        android:id="@+id/btn_picture_delete"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:onClick="delete_profile_picture"
+                        android:text="삭제" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/img_profile"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:adjustViewBounds="true"
+                    app:srcCompat="@drawable/basic_profile_img" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
+
+
+
+    <Button
+        android:id="@+id/btn_sign_up"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:onClick="send_to_server"
+        android:text="회원가입" />
+
+
+
+
+
+</LinearLayout>
