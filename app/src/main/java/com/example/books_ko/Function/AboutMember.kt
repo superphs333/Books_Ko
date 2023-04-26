@@ -11,6 +11,7 @@ import com.example.books_ko.Class.AppHelper
 import com.example.books_ko.R
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
+import java.util.regex.Pattern
 
 object AboutMember{
 
@@ -30,6 +31,26 @@ object AboutMember{
     /*
     함수
      */
+    // 정규식
+    open fun chk_regex(sort: String?, input_email: EditText?): Boolean{
+        val text = input_email!!.text.toString()
+        var regex ="";
+        Log.i("정보태그", "분류=>$sort, text=>$text")
+        // sort에 따라 정규식 분류
+        when (sort) {
+            "email" -> regex = "^[_a-zA-Z0-9-\\.]+@[\\.a-zA-Z0-9-]+\\.[a-zA-Z]+$"
+            "pw" ->                     // 대소문자 구분 숫자 특수문자 조합 9~12자리
+                regex = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&])[A-Za-z[0-9]$@$!%*#?&]{9,12}$"
+
+            "nickname" ->                     // 영문, 숫자로만 이루어진 4~12자리 문자
+                regex = "^[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣|0-9]{1}[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣|0-9_]{3,11}$"
+        }
+        var check = Pattern.matches(regex,text)
+        Log.i("정보태그", "정규식결과(chk_regex)=>$check")
+        return check;
+    }
+
+    // 닉네임, 이메일 중복 체크
     open fun chk_double(sort: String?, input: EditText?, callback: VolleyCallback?){
         Log.i("정보태그", "function chk_double")
         val chk_double_result = booleanArrayOf(false)
@@ -56,7 +77,11 @@ object AboutMember{
                     // 닉네임 vs 이메일 분기
                     when(sort){
                         "nickname" ->  {
-
+                            Toast.makeText(
+                                input?.context,
+                                input?.context?.getString(R.string.toast_nickname_double),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                          "email" -> {
                              // 이메일
