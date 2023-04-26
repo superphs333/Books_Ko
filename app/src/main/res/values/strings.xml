@@ -4,4 +4,21 @@
     <string name="app_title">Books</string>
     <!--  서버주소 -->
     <string name="server_url">https://books.dosymmm.ga/</string>
+    <!--
+    확인문구
+    -->
+    <string name="no_login_info">입력한 정보를 다시 한 번 확인해주세요</string>
+    <string name="toast_error">죄송합니다. 문제가 생겼습니다. 다시 시도해 주세요</string>
+    <string name="toast_email">이메일을 확인해주세요</string>
+    <string name="toast_email_double">중복된 이메일이 존재합니다</string>
+    <string name="toast_email_no_exit">해당 이메일로 등록된 회원이 존재하지 않습니다.</string>
+    <string name="sendtext_no">인증문자를 잘못 입력하셨습니다</string>
+    <string name="toast_nickname">닉네임을 확인해주세요</string>
+    <string name="toast_nickname_double">중복된 닉네임이 존재합니다</string>
+    <string name="nickname_before_equal">현재 닉네임과 같은 닉네임입니다.</string>
+    <string name="toast_pw">비밀번호를 확인해주세요</string>
+    <string name="toast_pw_double_chk">비밀번호와 비밀번호 확인은 일치해야 합니다</string>
+    <string name="no_send_email">전송된 인증코드가 없습니다</string>
+    <string name="login_ok">로그인 되었습니다.</string>
+    <string name="profile_img_update_ok">프로필 이미지가 성공적으로 변경되었습니다</string>
 </resources>

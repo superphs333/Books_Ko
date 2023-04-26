@@ -2,12 +2,15 @@ package com.example.books_ko.Function
 
 import android.util.Log
 import android.widget.EditText
+import android.widget.Toast
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.example.books_ko.R
 import com.example.books_ko.Class.AppHelper
+import com.example.books_ko.R
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
 
 object AboutMember{
 
@@ -42,26 +45,45 @@ object AboutMember{
                 Log.i("정보태그", "(chk_double)response=>$response")
 
                 // 결과값 파싱
-                //val jsonParser = JsonParser()
-                //val jsonElement: JsonElement = jsonParser.parse(response)
+                val jsonParser = JsonParser()
+                val jsonElement: JsonElement = jsonParser.parse(response)
 
                 // 결과값
-                //val result: String = jsonElement.getAsJsonObject().get("result").getAsString()
-                //Log.i("정보태그","result=>"+result);
+                val result: String = jsonElement.getAsJsonObject().get("result").getAsString()
+                Log.i("정보태그","result=>"+result);
 
+                if(result.equals("yes")){ // 중복인 경우
+                    // 닉네임 vs 이메일 분기
+                    when(sort){
+                        "nickname" ->  {
+
+                        }
+                         "email" -> {
+                             // 이메일
+                             Toast.makeText(
+                                 input?.context,
+                                 input?.context?.getString(R.string.toast_email_double),
+                                 Toast.LENGTH_SHORT
+                             ).show()
+                         }
+                    }
+                    // 포커스 두기
+                    input?.requestFocus();
+                    chk_double_result[0] = true
+                }else{ // 중복이 아닌 경우
+                    chk_double_result[0] = false
+                }
 
                 // 콜백에 결과값 전송
                 callback!!.onSuccess(chk_double_result[0])
             }, // end onResponse
             Response.ErrorListener { error ->
-
                 // 에러 발생
-                 val networkResponse = error.networkResponse
+                val networkResponse = error.networkResponse
                 if (networkResponse != null && networkResponse.data != null) {
                     val jsonError = String(networkResponse.data)
                     Log.d("정보태그", "onErrorResponse: $jsonError")
                 }
-
             }
         ) {
             // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
