@@ -329,6 +329,7 @@ class Activity_Signup : AppCompatActivity() {
     // 카메라를 시작
     private fun startCamera() {
         Log.i("정보태그","startCamera()실행!")
+
     }
 
 
