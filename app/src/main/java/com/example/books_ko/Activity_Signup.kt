@@ -409,7 +409,10 @@ class Activity_Signup : AppCompatActivity() {
 
 
     fun delete_profile_picture(view: View) {
-
+        // 프로필 이미지에 기본 이미지 셋팅
+        binding.imgProfile.setImageResource(R.drawable.basic_profile_img)
+        // uri에 셋팅되어 있는 값 초기화
+        image_Uri = null
     }
 
 
