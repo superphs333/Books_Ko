@@ -20,7 +20,8 @@ object AboutPicture {
     fun cameraOnePicture(resultLauncher: ActivityResultLauncher<Intent>,context: Context): String {
         // 카메라에서 이미지를 가져옴
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if(intent.resolveActivity(context.packageManager) != null){ // 설치 되어 있는 경우
+        val resolveActivity = intent.resolveActivity(context.packageManager)
+        if(resolveActivity !== null){ // 설치 되어 있는 경우
             // 1. 임의의 경로에 파일 만들기
             var photo_File: File? = null
             try{

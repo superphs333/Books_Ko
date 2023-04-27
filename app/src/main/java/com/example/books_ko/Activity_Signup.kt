@@ -240,7 +240,10 @@ class Activity_Signup : AppCompatActivity() {
                 // 앞에 file://이 붙어서 나옴
 
                 // 이미지 크롭하기
-                UCrop.of(return_uri,return_uri).start(this)
+                val cropIntent = UCrop.of(return_uri, return_uri)
+                    .withAspectRatio(1f, 1f) // 사각형 비율을 사용하려면 이 줄을 삭제하거나 주석 처리하세요.
+                    .getIntent(applicationContext)
+                rl_crop!!.launch(cropIntent)
             }
         }
 
