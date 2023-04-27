@@ -1,6 +1,7 @@
 package com.example.books_ko
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -37,7 +38,7 @@ class Activity_Signup : AppCompatActivity() {
 
     companion object {
         // 필요한 권한과 요청 코드 정의
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
         private const val PERMISSION_REQUEST_CODE = 10
     }
 
@@ -67,6 +68,8 @@ class Activity_Signup : AppCompatActivity() {
     private var rl_camera // 카메라
             : ActivityResultLauncher<Intent>? = null
     private val rl_gallery // 갤러리
+            : ActivityResultLauncher<Intent>? = null
+    private var rl_crop // 크롭
             : ActivityResultLauncher<Intent>? = null
     var image_Uri: String? = null
     var image_bitmap: Bitmap? = null
@@ -100,7 +103,7 @@ class Activity_Signup : AppCompatActivity() {
                 startCamera()
             } else {
                 // You can request permissions again or show a message to the user
-                Toast.makeText(this, "카메라를 사용하려면 카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "카메라를 사용하려면 카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
 
                 // 다시 사용자가 권한을 요청 하기
                 showPermissionRationaleDialog()
@@ -112,7 +115,7 @@ class Activity_Signup : AppCompatActivity() {
 
     private fun showPermissionRationaleDialog() {
         AlertDialog.Builder(this)
-            .setMessage("카메라를 사용하려면 카메라 권한이 필요합니다.")
+            .setMessage("카메라를 사용하려면 권한이 필요합니다.")
             .setPositiveButton("권한 요청") { _, _ ->
                 ActivityCompat.requestPermissions(
                     this, REQUIRED_PERMISSIONS, PERMISSION_REQUEST_CODE
@@ -197,6 +200,49 @@ class Activity_Signup : AppCompatActivity() {
                 }
             }
         })
+
+        rl_crop = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            Log.i("정보태그","result->"+result)
+            if (result.resultCode == Activity.RESULT_OK) {
+
+                var resultUri = result.data?.let { UCrop.getOutput(it) };
+
+
+                // 이미지 셋팅
+                binding.imgProfile.setImageURI(resultUri)
+
+            }else if(result.resultCode == UCrop.RESULT_ERROR){
+                val cropError = UCrop.getError(result.data!!)
+                if (cropError != null) {
+                    Log.e("TAG", "UCrop error: ${cropError.message}")
+                }
+            }
+        }
+
+        rl_camera = registerForActivityResult<Intent, ActivityResult>(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                Log.i("정보태그", "(registerForActivityResult)카메라")
+                Log.i("정보태그", "image_Uri=>$image_Uri")
+                val original_uri = Uri.parse(image_Uri)
+                var return_uri: Uri? = null
+                return_uri = if (original_uri.scheme == null) {
+                    Log.i("정보태그", "original_uri.getScheme()==null")
+                    Uri.fromFile(File(image_Uri))
+                } else {
+                    Log.i("정보태그", "original_uri.getScheme()!=null")
+                    original_uri
+                }
+                Log.i("정보태그", "return_uri=$return_uri")
+                // 앞에 file://이 붙어서 나옴
+
+                // 이미지 크롭하기
+                UCrop.of(return_uri,return_uri).start(this)
+            }
+        }
 
 
 
@@ -333,34 +379,12 @@ class Activity_Signup : AppCompatActivity() {
     private fun startCamera() {
         Log.i("정보태그","startCamera()실행!")
 
-        // launcher 선언
-        rl_camera = registerForActivityResult<Intent, ActivityResult>(
-            ActivityResultContracts.StartActivityForResult(),
-        ) { result ->
-            if (result.resultCode == RESULT_OK) {
-                Log.i("정보태그", "(registerForActivityResult)카메라")
-                Log.i("정보태그", "image_Uri=>$image_Uri")
-                val original_uri = Uri.parse(image_Uri)
-                var return_uri: Uri? = null
-                return_uri = if (original_uri.scheme == null) {
-                    Log.i("정보태그", "original_uri.getScheme()==null")
-                    Uri.fromFile(File(image_Uri))
-                } else {
-                    Log.i("정보태그", "original_uri.getScheme()!=null")
-                    original_uri
-                }
-                Log.i("정보태그", "return_uri=$return_uri")
-                // 앞에 file://이 붙어서 나옴
-
-                // 이미지 크롭하기
-                UCrop.of(return_uri,)
-            }
-        }
-
         // 임시파일 가져오고, 카메라로 전달
         image_Uri = ap.cameraOnePicture(rl_camera!!,applicationContext)
 
     }
+
+
 
 
 
