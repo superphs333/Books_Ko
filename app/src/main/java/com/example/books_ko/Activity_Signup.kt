@@ -1,47 +1,49 @@
 package com.example.books_ko
 
+import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.books_ko.Class.GMailSender
 import com.example.books_ko.Function.AboutMember
+import com.example.books_ko.Function.AboutPicture
 import com.example.books_ko.databinding.ActivitySignupBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.io.FileInputStream
 import javax.mail.MessagingException
 import javax.mail.SendFailedException
-import android.Manifest
-import android.app.Activity
-import android.app.AlertDialog
-import android.net.Uri
-import android.provider.Settings
-import androidx.activity.result.contract.ActivityResultContracts
 
 
 class Activity_Signup : AppCompatActivity() {
 
     companion object {
         // 필요한 권한과 요청 코드 정의
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
         private const val PERMISSION_REQUEST_CODE = 10
     }
 
     // 바인딩 변수
     private lateinit var binding: ActivitySignupBinding // Declare the binding variable
     val am = AboutMember;
+    val ap = AboutPicture
 
 
 
@@ -329,6 +331,34 @@ class Activity_Signup : AppCompatActivity() {
     // 카메라를 시작
     private fun startCamera() {
         Log.i("정보태그","startCamera()실행!")
+
+        // launcher 선언
+        rl_camera = registerForActivityResult<Intent, ActivityResult>(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                Log.i("정보태그", "(registerForActivityResult)카메라")
+                Log.i("정보태그", "image_Uri=>$image_Uri")
+                val original_uri = Uri.parse(image_Uri)
+                var return_uri: Uri? = null
+                return_uri = if (original_uri.scheme == null) {
+                    Log.i("정보태그", "original_uri.getScheme()==null")
+                    Uri.fromFile(File(image_Uri))
+                } else {
+                    Log.i("정보태그", "original_uri.getScheme()!=null")
+                    original_uri
+                }
+                Log.i("정보태그", "return_uri=$return_uri")
+                // 앞에 file://이 붙어서 나옴
+
+                // 이미지 크롭하기
+                CropImage.activity(return_uri).setGuidelines(CropImageView.Guidelines.ON)
+                    .start(activity)
+            }
+        }
+
+        // 임시파일 가져오고, 카메라로 전달
+        image_Uri = ap.cameraOnePicture(rl_camera!!,applicationContext)
 
     }
 
