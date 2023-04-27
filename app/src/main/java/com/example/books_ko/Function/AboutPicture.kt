@@ -60,4 +60,12 @@ object AboutPicture {
         return image
     }
 
+    fun gallery_one_picture(resultLauncher: ActivityResultLauncher<Intent>) {
+        val intent = Intent()
+        intent.type = "image/*"
+        // 이미지를 열 수 있는 앱을 호출
+        intent.action = Intent.ACTION_GET_CONTENT
+        resultLauncher.launch(intent)
+    }
+
 }

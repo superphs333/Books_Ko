@@ -67,7 +67,7 @@ class Activity_Signup : AppCompatActivity() {
     // launher 선언
     private var rl_camera // 카메라
             : ActivityResultLauncher<Intent>? = null
-    private val rl_gallery // 갤러리
+    private var rl_gallery // 갤러리
             : ActivityResultLauncher<Intent>? = null
     private var rl_crop // 크롭
             : ActivityResultLauncher<Intent>? = null
@@ -240,10 +240,25 @@ class Activity_Signup : AppCompatActivity() {
                 // 앞에 file://이 붙어서 나옴
 
                 // 이미지 크롭하기
-                val cropIntent = UCrop.of(return_uri, return_uri)
+                var cropIntent = UCrop.of(return_uri, return_uri)
                     .withAspectRatio(1f, 1f) // 사각형 비율을 사용하려면 이 줄을 삭제하거나 주석 처리하세요.
                     .getIntent(applicationContext)
                 rl_crop!!.launch(cropIntent)
+            }
+        }
+
+
+        rl_gallery = registerForActivityResult<Intent, ActivityResult>(
+        ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                // 이미지 크롭하기
+                val imageUri = result.data!!.data!!
+                val outputUri = Uri.fromFile(File(applicationContext.cacheDir, "cropped_image.jpg"))
+                var cropIntent2 = UCrop.of(imageUri, outputUri)
+                    .withAspectRatio(1f, 1f) // 사각형 비율을 사용하려면 이 줄을 삭제하거나 주석 처리하세요.
+                    .getIntent(applicationContext)
+                    rl_crop!!.launch(cropIntent2)
             }
         }
 
@@ -387,9 +402,15 @@ class Activity_Signup : AppCompatActivity() {
 
     }
 
+    // 갤러리에서 이미지 가져오기
+    fun gallery_for_profile(view: View) {
+        ap.gallery_one_picture(rl_gallery!!);
+    }
 
 
+    fun delete_profile_picture(view: View) {
 
+    }
 
 
 }
