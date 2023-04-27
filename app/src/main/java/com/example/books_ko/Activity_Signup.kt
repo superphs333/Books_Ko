@@ -23,6 +23,7 @@ import com.example.books_ko.Class.GMailSender
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.Function.AboutPicture
 import com.example.books_ko.databinding.ActivitySignupBinding
+import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -352,8 +353,7 @@ class Activity_Signup : AppCompatActivity() {
                 // 앞에 file://이 붙어서 나옴
 
                 // 이미지 크롭하기
-                CropImage.activity(return_uri).setGuidelines(CropImageView.Guidelines.ON)
-                    .start(activity)
+                UCrop.of(return_uri,)
             }
         }
 
