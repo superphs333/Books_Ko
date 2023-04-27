@@ -28,6 +28,7 @@ import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.http.Multipart
 import java.io.File
 import java.io.FileInputStream
 import javax.mail.MessagingException
@@ -414,6 +415,75 @@ class Activity_Signup : AppCompatActivity() {
         // uri에 셋팅되어 있는 값 초기화
         image_Uri = null
     }
+
+    /*
+    회원가입 정보 서버로 보내기
+     */
+    fun send_to_server(view: View){
+        /*
+        검사
+         */
+        when {
+            // 이메일 중복 확인
+            !email_no_double -> {
+                Toast.makeText(
+                    applicationContext,
+                    "이메일 중복체크를 확인해주세요",
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
+
+            // 이메일 인증 문자 확인
+            !binding.editEmailChk.text.toString().equals(temp_email_string) -> {
+                Toast.makeText(
+                    applicationContext,
+                    "이메일 인증 문자를 확인해주세요",
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
+
+            // 비밀번호 정규식 확인
+            !am.chk_regex("pw", binding.editPw) -> {
+                Toast.makeText(
+                    applicationContext,
+                    applicationContext.getString(R.string.toast_pw),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+
+            // 비밀번호 = 비밀번호 확인 문구 일치 여부
+            !binding.editPw.text.toString().equals(binding.editPwDouble.text.toString()) -> {
+                Toast.makeText(
+                    applicationContext,
+                    applicationContext.getString(R.string.toast_pw_double_chk),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+
+            // 닉네임
+            !nick_no_double -> {
+                Toast.makeText(
+                    applicationContext,
+                    "닉네임을 확인해주세요",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+        }
+        Log.i("정보태그", "모든 정규식 통과")
+
+        /*
+
+         */
+
+
+    }
+
+
 
 
 }
