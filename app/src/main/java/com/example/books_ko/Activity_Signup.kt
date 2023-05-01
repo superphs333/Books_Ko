@@ -228,7 +228,7 @@ class Activity_Signup : AppCompatActivity() {
                     val outputFile = File(applicationContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "${imageFileName}.jpg") // 외부 저장소에 새 이미지 파일 생성
                     val outputStream = FileOutputStream(outputFile)
 
-                    // 이미지 팡리 복사
+                    // 이미지 파일 복사
                     inputStream.use { input ->
                         outputStream.use { output ->
                             input?.copyTo(output)
