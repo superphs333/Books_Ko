@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -21,16 +22,29 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.books_ko.Class.GMailSender
+import com.example.books_ko.Data.ApiData
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.Function.AboutPicture
+import com.example.books_ko.Interface.JsonPlaceHolderApi
 import com.example.books_ko.databinding.ActivitySignupBinding
 import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.http.Multipart
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.mail.MessagingException
 import javax.mail.SendFailedException
 
@@ -49,17 +63,15 @@ class Activity_Signup : AppCompatActivity() {
     val ap = AboutPicture
 
 
-
     /*
     이메일용 변수
      */
     var gMailSender: GMailSender? = null // 이메일 보내는 객체
-    var temp_email_string=""; // 이메일 인증 문자
+    var temp_email_string = ""; // 이메일 인증 문자
     var email_no_double = false; // 이메일 중복 체크 여부
     var temp_email_not_duplication = ""; //  중복 확인 체크한(중복이 아닌) 이메일
 
     var nick_no_double = false;
-
 
 
     /*
@@ -82,10 +94,10 @@ class Activity_Signup : AppCompatActivity() {
     var mFile_Input_Stream: FileInputStream? = null
 
     // 필요한 모든 권한이 부여되었는지 확인(bool값 반환)
-        // REQUIRED_PERMISSIONS 의 모든 필요한 권한이 부여된 경우에 true반환
+    // REQUIRED_PERMISSIONS 의 모든 필요한 권한이 부여된 경우에 true반환
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-            // REQUIRED_PERMISSIONS : 권한 문자열의 컬렉션(목록이나 배열)
-            // all : 중괄호 안에 주어진 조건을 만족하는 컬렉션의 모든 요소 검사
+        // REQUIRED_PERMISSIONS : 권한 문자열의 컬렉션(목록이나 배열)
+        // all : 중괄호 안에 주어진 조건을 만족하는 컬렉션의 모든 요소 검사
         // 현재 권한이 부여되었는지 확인(권한의 현재 상태 반환)
         ContextCompat.checkSelfPermission(
             baseContext, // 애플리케이션의 기본 컨텍스트
@@ -130,13 +142,10 @@ class Activity_Signup : AppCompatActivity() {
     }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignupBinding.inflate(layoutInflater);
         setContentView(binding.root)
-
-
 
 
         /*
@@ -205,16 +214,37 @@ class Activity_Signup : AppCompatActivity() {
         rl_crop = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            Log.i("정보태그","result->"+result)
+            Log.i("정보태그", "result->" + result)
             if (result.resultCode == Activity.RESULT_OK) {
 
                 var resultUri = result.data?.let { UCrop.getOutput(it) };
+                Log.i("정보태그","(크롭후)resultUri->"+resultUri)
 
+                // 이미지 URI가 캐시 디렉토리를 참조하는 경우 외부 저장소로 복사
+                if (resultUri != null && resultUri.toString().startsWith("file:///data/user/0/")) {
+                    val timeStamp  = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+                    val imageFileName = "Profile_$timeStamp"+"_"
+                    val inputStream = contentResolver.openInputStream(resultUri) // 이미지 파일 읽는다
+                    val outputFile = File(applicationContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "${imageFileName}.jpg") // 외부 저장소에 새 이미지 파일 생성
+                    val outputStream = FileOutputStream(outputFile)
+
+                    // 이미지 팡리 복사
+                    inputStream.use { input ->
+                        outputStream.use { output ->
+                            input?.copyTo(output)
+                        }
+                    }
+
+                    // 외부 저장소에 있는 새 파일의 URI로 변경
+                    resultUri = Uri.fromFile(outputFile)
+                    image_Uri = resultUri?.toString()?.removePrefix("file://")
+                }
 
                 // 이미지 셋팅
                 binding.imgProfile.setImageURI(resultUri)
 
-            }else if(result.resultCode == UCrop.RESULT_ERROR){
+
+            } else if (result.resultCode == UCrop.RESULT_ERROR) {
                 val cropError = UCrop.getError(result.data!!)
                 if (cropError != null) {
                     Log.e("TAG", "UCrop error: ${cropError.message}")
@@ -227,7 +257,7 @@ class Activity_Signup : AppCompatActivity() {
         ) { result ->
             if (result.resultCode == RESULT_OK) {
                 Log.i("정보태그", "(registerForActivityResult)카메라")
-                Log.i("정보태그", "image_Uri=>$image_Uri")
+                Log.i("정보태그", "(카메라)image_Uri=>$image_Uri")
                 val original_uri = Uri.parse(image_Uri)
                 var return_uri: Uri? = null
                 return_uri = if (original_uri.scheme == null) {
@@ -250,7 +280,7 @@ class Activity_Signup : AppCompatActivity() {
 
 
         rl_gallery = registerForActivityResult<Intent, ActivityResult>(
-        ActivityResultContracts.StartActivityForResult(),
+            ActivityResultContracts.StartActivityForResult(),
         ) { result ->
             if (result.resultCode == RESULT_OK) {
                 // 이미지 크롭하기
@@ -259,10 +289,9 @@ class Activity_Signup : AppCompatActivity() {
                 var cropIntent2 = UCrop.of(imageUri, outputUri)
                     .withAspectRatio(1f, 1f) // 사각형 비율을 사용하려면 이 줄을 삭제하거나 주석 처리하세요.
                     .getIntent(applicationContext)
-                    rl_crop!!.launch(cropIntent2)
+                rl_crop!!.launch(cropIntent2)
             }
         }
-
 
 
     }
@@ -295,7 +324,7 @@ class Activity_Signup : AppCompatActivity() {
                 Log.i("정보태그", "chk_double vollycallback=>$result")
 
                 // 중복이 아닌 경우에만 이메일 전송
-                if(!result){
+                if (!result) {
                     // 중복 확인 여부 셋팅
                     email_no_double = true;
                     // 인증된 이메일 셋팅
@@ -308,7 +337,7 @@ class Activity_Signup : AppCompatActivity() {
                     gMailSender = GMailSender();
                     // 임시문자 생성
                     temp_email_string = gMailSender!!.getEmailCode().toString()
-                    // 이메일 전송
+                    Log.i("정보태그","임시문자->${temp_email_string}")
                     // 이메일 전송
                     val email_title: String = getString(R.string.app_title) + "에서 온 인증문자입니다"
                     val email_content = "다음의 인증문자를 입력하세요 :$temp_email_string"
@@ -320,15 +349,27 @@ class Activity_Signup : AppCompatActivity() {
                                 binding.editEmail.text.toString()
                             )
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(applicationContext, "이메일이 전송되었습니다!", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    applicationContext,
+                                    "이메일이 전송되었습니다!",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         } catch (e: SendFailedException) {
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(applicationContext, "이메일 형식이 잘못되었습니다.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    applicationContext,
+                                    "이메일 형식이 잘못되었습니다.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         } catch (e: MessagingException) {
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(applicationContext, "인터넷 연결을 확인해주십시오+", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    applicationContext,
+                                    "인터넷 연결을 확인해주십시오+",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 Log.d("정보태그", "MessagingException=>" + e.message)
                             }
                         } catch (e: Exception) {
@@ -378,7 +419,7 @@ class Activity_Signup : AppCompatActivity() {
         })
     }
 
-    fun camera_for_profile(view: View?){
+    fun camera_for_profile(view: View?) {
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -388,18 +429,18 @@ class Activity_Signup : AppCompatActivity() {
                 this,
                 REQUIRED_PERMISSIONS, // 요청 할 권한의 배열
                 PERMISSION_REQUEST_CODE
-                    // 권한 요청에 대한 고유한 요청 코드
-                    // onRequestPermissionsResult 에서 권한 요청 결과를 처리 할 때 사용됨
+                // 권한 요청에 대한 고유한 요청 코드
+                // onRequestPermissionsResult 에서 권한 요청 결과를 처리 할 때 사용됨
             )
         }
     }
 
     // 카메라를 시작
     private fun startCamera() {
-        Log.i("정보태그","startCamera()실행!")
+        Log.i("정보태그", "startCamera()실행!")
 
         // 임시파일 가져오고, 카메라로 전달
-        image_Uri = ap.cameraOnePicture(rl_camera!!,applicationContext)
+        image_Uri = ap.cameraOnePicture(rl_camera!!, applicationContext)
 
     }
 
@@ -419,7 +460,7 @@ class Activity_Signup : AppCompatActivity() {
     /*
     회원가입 정보 서버로 보내기
      */
-    fun send_to_server(view: View){
+    fun send_to_server(view: View) {
         /*
         검사
          */
@@ -477,11 +518,58 @@ class Activity_Signup : AppCompatActivity() {
         Log.i("정보태그", "모든 정규식 통과")
 
         /*
-
+        데이터 전송
          */
+        // Retrofit 인터페이스 생성
+        val retrofit = Retrofit.Builder()
+            .baseUrl(applicationContext.getString(R.string.server_url))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val myApi = retrofit.create(JsonPlaceHolderApi::class.java)
+        val accept_sort = "sign_up".toRequestBody("text/plain".toMediaTypeOrNull())
+        val email = binding.editEmail.text.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val nickname = binding.editNick.text.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val password = binding.editPw.text.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val filePath = File(image_Uri) // 이미지 파일의 경로를 가져옵니다.
+        val profileImageFile = File(filePath.absolutePath) // 이미지 파일 객체를 생성합니다.
+        val profileImage = profileImageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+        val profileImagePart = MultipartBody.Part.createFormData("uploadedfile", profileImageFile.name, profileImage)
+        myApi.sendDatatoSignUp(accept_sort,email, password, nickname, profileImagePart).enqueue(object :
+            Callback<ApiResponse<ApiData>> {
+            override fun onResponse(call: Call<ApiResponse<ApiData>>, response: Response<ApiResponse<ApiData>>) {
+                var toString: String = response.raw().toString()
+                Log.i("정보태그","정보->${toString}")
+                // 요청 성공 처리
+                val result = response.body()
+
+                if (result?.status == "success") {
+                    // 서버 응답이 성공적으로 받아졌을 때 처리할 코드 작성
+                    Toast.makeText(applicationContext, "회원가입이 완료되었습니다!", Toast.LENGTH_SHORT).show()
+                    // 로그인 페이지로 이동
+                    val intent = Intent(applicationContext, MainActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    // 서버 응답이 실패했을 때 처리할 코드 작성
+                    Toast.makeText(
+                        applicationContext,
+                        "죄송합니다. 문제가 생겼습니다. 다시 시도해주세요",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<ApiData>>, t: Throwable) {
+                // 요청 실패 처리
+                Log.i("정보태그",t.message.toString())
+            }
+        })
 
 
     }
+
+
+
 
 
 
