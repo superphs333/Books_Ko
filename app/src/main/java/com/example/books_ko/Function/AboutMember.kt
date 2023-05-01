@@ -129,6 +129,68 @@ object AboutMember{
         appHelper.requestQueue!!.add(request)
     }
 
+    open fun chk_login(email: EditText?, pw: EditText?,auto_login: Boolean, callback: VolleyCallback?){
+        // 웹페이지 실행하기
+        val url = email?.context?.getString(R.string.server_url)+"About_Member.php";
+        val request: StringRequest = object : StringRequest(
+            Method.POST,
+            url,
+            Response.Listener<String> { response ->
+
+                // 정상 응답
+                Log.i("정보태그", "(chk_double)response=>$response")
+
+                // 결과값 파싱
+                val jsonParser = JsonParser()
+                val jsonElement: JsonElement = jsonParser.parse(response)
+
+                // 결과값
+                val result: String = jsonElement.getAsJsonObject().get("result").getAsString()
+                Log.i("정보태그","result=>"+result);
+
+                if(result.equals("yes")){ // 로그인 정보 존재
+                    Toast.makeText(
+                        email?.context,
+                        email?.context?.getString(R.string.login_ok),
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    //
+                }else{
+                    Toast.makeText(
+                        email?.context,
+                        email?.context?.getString(R.string.no_login_info),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+
+            }, // end onResponse
+            Response.ErrorListener { error ->
+                // 에러 발생
+                val networkResponse = error.networkResponse
+                if (networkResponse != null && networkResponse.data != null) {
+                    val jsonError = String(networkResponse.data)
+                    Log.d("정보태그", "onErrorResponse: $jsonError")
+                }
+            }
+        ) {
+            @Throws(AuthFailureError::class)
+            override fun getParams(): Map<String, String>? {
+                val params: MutableMap<String, String> = HashMap()
+                Log.i("정보태그", "")
+                params["accept_sort"] = "login"
+                params["email"] = email!!.text.toString() // nickname or email
+                params["pw"] = pw!!.text.toString() // nickname or email
+                return params
+            }
+        }
+
+        request.setShouldCache(false)
+        appHelper.requestQueue = Volley.newRequestQueue(email?.context)
+        appHelper.requestQueue!!.add(request)
+    }
+
 
 
 }
