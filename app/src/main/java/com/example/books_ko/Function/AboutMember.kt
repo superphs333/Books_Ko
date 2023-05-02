@@ -71,7 +71,7 @@ object AboutMember{
     }
 
     // 닉네임, 이메일 중복 체크
-    open fun chk_double(sort: String?, input: EditText?, callback: VolleyCallback?){
+    open fun chk_double(sort: String?, input: EditText?, callback: VolleyCallback?,from : String?=""){
         Log.i("정보태그", "function chk_double")
         val chk_double_result = booleanArrayOf(false)
 
@@ -103,13 +103,16 @@ object AboutMember{
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+
                          "email" -> {
-                             // 이메일
-                             Toast.makeText(
-                                 input?.context,
-                                 input?.context?.getString(R.string.toast_email_double),
-                                 Toast.LENGTH_SHORT
-                             ).show()
+                             if(from==""){
+                                 // 이메일
+                                 Toast.makeText(
+                                     input?.context,
+                                     input?.context?.getString(R.string.toast_email_double),
+                                     Toast.LENGTH_SHORT
+                                 ).show()
+                             }
                          }
                     }
                     // 포커스 두기

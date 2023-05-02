@@ -127,7 +127,10 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this,Activity_Signup::class.java);
         startActivity(intent);
     }
-    fun find_pw(view: View) {}
+    fun find_pw(view: View) {
+        val intent = Intent(this,Activity_Find_Pw::class.java);
+        startActivity(intent);
+    }
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount){
         Log.d("정보태그", "firebaseAuthWithGoogle:" + acct.id)
