@@ -6,11 +6,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "user")
 data class UserData(
-
     @PrimaryKey val email: String,
-    @ColumnInfo(name = "nickname") val nickname: String,
-    @ColumnInfo(name = "platform_type") val platform_type: String,
-    @ColumnInfo(name = "auto_login") val auto_login: Boolean,
-    @ColumnInfo(name = "profile_url") val profile_url: String,
-) {
-}
+    @ColumnInfo(name = "nickname") var nickname: String,
+    @ColumnInfo(name = "platform_type") var platform_type: String,
+    @ColumnInfo(name = "auto_login") var auto_login: Boolean,
+    @ColumnInfo(name = "profile_url") var profile_url: String,
+)

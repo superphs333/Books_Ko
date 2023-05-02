@@ -6,7 +6,6 @@ import android.content.Intent
 import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.room.Room
@@ -15,17 +14,17 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.books_ko.Activity_Main2
+import com.example.books_ko.Activity_Set_nickname
 import com.example.books_ko.Class.AppHelper
 import com.example.books_ko.Data.UserData
 import com.example.books_ko.DataBase.UserDatabase
 import com.example.books_ko.R
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 import kotlin.coroutines.resume
@@ -188,16 +187,14 @@ object AboutMember{
                         profile_url = tmp_profile_url
                     }
                     // 정보저장
-                    database.userDao().getUserByEmail(email!!.text.toString()).observe(activity, Observer { existingUser ->
-                        if (existingUser == null) {
-                            Log.i("정보태그","existingUser  null")
-                            val user = UserData(email!!.text.toString(), nickname, "normal",auto_login,profile_url)
-                            database.userDao().insertUser(user)
-                        }else{
-                            Log.i("정보태그","existingUser  존재")
+                    GlobalScope.launch(Dispatchers.IO) {
+                        database.userDao().clearAllUsers()
+                        val user = UserData(email!!.text.toString(), nickname, "normal",auto_login,profile_url)
+                        database.userDao().insertUser(user)
+                    }
 
-                        }
-                    })
+
+
 
                     // 메인 페이지로 이동
                     email?.context?.let {
@@ -306,6 +303,164 @@ object AboutMember{
         }
 
         return result
+    }
+
+    /*
+    구글 - 신규회원인지, 기존회원인지 분류
+     */
+    fun validate_new(activity: LifecycleOwner,context : Context,sns_id: String, profile_url: String, login_email: String) {
+        val url = context.getString(R.string.server_url)+"About_Member.php";
+        val request: StringRequest = object : StringRequest(
+            Method.POST,
+            url,
+            Response.Listener<String> { response ->
+
+                // 정상 응답
+                Log.i("정보태그", "(chk_double)response=>$response")
+
+                // 결과값 파싱
+                val jsonParser = JsonParser()
+                val jsonElement: JsonElement = jsonParser.parse(response)
+
+                // 결과값
+                val result: String = jsonElement.getAsJsonObject().get("result").getAsString()
+                Log.i("정보태그","result=>"+result);
+
+                if(result.equals("yes")){ // 존재회원(구글-로그아웃 했다가, 다시 로그인)
+                    Log.i("정보태그","구글로그인-기존회원")
+                    // Room에 회원 정보 저장
+                    val user = UserData(login_email, "", "google",true,profile_url)
+                    database = Room.databaseBuilder(context, UserDatabase::class.java, "app_database").build()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        database.userDao().clearAllUsers()
+                        user.nickname = getMemberInfo(context,login_email,"nickname")
+                        database.userDao().insertUser(user)
+                    }
+                    // Main페이지로 이동
+                    context?.let {
+                        val intent = Intent(it, Activity_Main2::class.java)
+                        it.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                        if (it is Activity) {
+                            it.finish()
+                        }
+                    }
+
+                }else{ // 신규회원 -> 닉네임 설정 액티비티로 이동
+                    Log.i("정보태그","구글로그인-신규회원")
+                    // 신규회원
+                    // 닉네임 설정 액티비티로 이동
+                    context?.let {
+                        val intent = Intent(it, Activity_Set_nickname::class.java)
+                        intent.putExtra("profile_url", profile_url)
+                        intent.putExtra("sns_id", sns_id)
+                        intent.putExtra("login_email", login_email)
+                        intent.putExtra("why_change", "signup") // 닉네임 변경 목적
+                        it.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                        if (it is Activity) {
+                            it.finish()
+                        }
+                    }
+                }
+
+
+            }, // end onResponse
+            Response.ErrorListener { error ->
+                // 에러 발생
+                val networkResponse = error.networkResponse
+                if (networkResponse != null && networkResponse.data != null) {
+                    val jsonError = String(networkResponse.data)
+                    Log.d("정보태그", "onErrorResponse: $jsonError")
+                }
+            }
+        ) {
+            @Throws(AuthFailureError::class)
+            override fun getParams(): Map<String, String>? {
+                val params: MutableMap<String, String> = HashMap()
+                params["accept_sort"] = "validate_new"
+                params["sns_id"] = sns_id
+                return params
+            }
+        }
+
+        request.setShouldCache(false)
+        appHelper.requestQueue = Volley.newRequestQueue(context)
+        appHelper.requestQueue!!.add(request)
+    }
+
+     fun google_sign_up(activity: LifecycleOwner,context: Context,email: String, sns_id: String, nickname: String, profile_url: String) {
+        val url = context.getString(R.string.server_url)+"About_Member.php";
+        val request: StringRequest = object : StringRequest(
+            Method.POST,
+            url,
+            Response.Listener<String> { response ->
+
+                // 정상 응답
+                Log.i("정보태그", "(google_sign_up)response=>$response")
+
+                // 결과값 파싱
+                val jsonParser = JsonParser()
+                val jsonElement: JsonElement = jsonParser.parse(response)
+
+                // 결과값
+                val result: String = jsonElement.getAsJsonObject().get("result").getAsString()
+                Log.i("정보태그","result=>"+result);
+
+                if (result == "success") {
+                    Toast.makeText(
+                        context, "회원가입이 완료되었습니다", Toast.LENGTH_LONG
+                    ).show()
+
+                    // 회원정보 저장
+                    val user = UserData(email, nickname, "google",true,profile_url)
+                    database = Room.databaseBuilder(context, UserDatabase::class.java, "app_database").build()
+                    GlobalScope.launch(Dispatchers.IO) {
+                        database.userDao().clearAllUsers()
+                        database.userDao().insertUser(user)
+                    }
+
+                    // 페이지 이동
+                    context?.let {
+                        val intent = Intent(it, Activity_Main2::class.java)
+                        it.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                        if (it is Activity) {
+                            it.finish()
+                        }
+                    }
+                } else {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.toast_error),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+
+            }, // end onResponse
+            Response.ErrorListener { error ->
+                // 에러 발생
+                val networkResponse = error.networkResponse
+                if (networkResponse != null && networkResponse.data != null) {
+                    val jsonError = String(networkResponse.data)
+                    Log.d("정보태그", "onErrorResponse: $jsonError")
+                }
+            }
+        ) {
+            @Throws(AuthFailureError::class)
+            override fun getParams(): Map<String, String>? {
+                val params: MutableMap<String, String> = HashMap()
+                params["accept_sort"] = "sign_up_google"
+                params["sns_id"] = sns_id
+                params["email"] = email
+                params["nickname"] = nickname
+                params["profile_url"] = profile_url
+
+                return params
+            }
+        }
+
+        request.setShouldCache(false)
+        appHelper.requestQueue = Volley.newRequestQueue(context)
+        appHelper.requestQueue!!.add(request)
     }
 
 
