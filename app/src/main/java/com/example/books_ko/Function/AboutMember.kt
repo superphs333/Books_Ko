@@ -18,6 +18,7 @@ import com.example.books_ko.Activity_Set_nickname
 import com.example.books_ko.Class.AppHelper
 import com.example.books_ko.Data.UserData
 import com.example.books_ko.DataBase.UserDatabase
+import com.example.books_ko.MainActivity
 import com.example.books_ko.R
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -464,6 +465,162 @@ object AboutMember{
         request.setShouldCache(false)
         appHelper.requestQueue = Volley.newRequestQueue(context)
         appHelper.requestQueue!!.add(request)
+    }
+
+   fun Change_Member_Info(context: Context,activity:LifecycleOwner,sort: String, input: String, email: String) {
+       val url = context.getString(R.string.server_url)+"About_Member.php";
+       val request: StringRequest = object : StringRequest(
+           Method.POST,
+           url,
+           Response.Listener<String> { response ->
+
+               // 정상 응답
+               Log.i("정보태그", "(google_sign_up)response=>$response")
+
+               // 결과값 파싱
+               val jsonParser = JsonParser()
+               val jsonElement: JsonElement = jsonParser.parse(response)
+
+               // 결과값
+               val result: String = jsonElement.getAsJsonObject().get("result").getAsString()
+               Log.i("정보태그","result=>"+result);
+
+               if(result == "success"){
+                   database = Room.databaseBuilder(context, UserDatabase::class.java, "app_database").build()
+                    // 정보 Room에 업데이트
+                   if(sort=="nickname"){
+                       database.userDao().updateUserNickName(email,input)
+                   }
+
+                   /*
+                   페이지 이동 분기 -> Room에 저장 여부에 따라
+                    - 저장되어 있지 않은 경우(비밀번호찾기->비밀번호변경)
+                    */
+                   val userLiveData = database.userDao().getUser()
+                    // LiveData를 사용하여 데이터 변경 시 UI 업데이트
+                   userLiveData.observe(activity, Observer { userData ->
+                        if(userData != null){  // 나머지 => 해당 액티비티만 finish
+
+                        }else{ // 비밀번호 찾기->비밀번호 변경으로 온 경우 => 메인페이지 이동
+                            context?.let {
+                                val intent = Intent(it, MainActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                it.startActivity(intent)
+                                if (it is Activity) {
+                                    it.finish()
+                                }
+                            }
+                        }
+                   })
+
+
+               }else{
+                   Toast.makeText(
+                       context,
+                       context.getString(R.string.toast_error),
+                       Toast.LENGTH_SHORT
+                   ).show()
+
+               }
+
+
+           }, // end onResponse
+           Response.ErrorListener { error ->
+               // 에러 발생
+               val networkResponse = error.networkResponse
+               if (networkResponse != null && networkResponse.data != null) {
+                   val jsonError = String(networkResponse.data)
+                   Log.d("정보태그", "onErrorResponse: $jsonError")
+               }
+           }
+       ) {
+           @Throws(AuthFailureError::class)
+           override fun getParams(): Map<String, String>? {
+               val params: MutableMap<String, String> = HashMap()
+               params["accept_sort"] = "Change_Member_Info"
+               params["email"] = email
+               params["sort"] = sort
+               when (sort) {
+                   "pw" -> params["pw"] = input
+                   "nickname" -> params["nickname"] = input
+                   "sender_id" -> params["sender_id"] = input
+               }
+               return params
+           }
+       }
+
+       request.setShouldCache(false)
+       appHelper.requestQueue = Volley.newRequestQueue(context)
+       appHelper.requestQueue!!.add(request)
+    }
+
+    private suspend fun GetMemberAllInfo(context: Context, email:String):Map<String,String>{
+        val url = context.getString(R.string.server_url) + "About_Member.php"
+        var result = ""
+        val memberInfo = mutableMapOf<String, String>()
+
+        val response = suspendCoroutine<String> { continuation ->
+            val request = object : StringRequest(
+                Method.POST,
+                url,
+                Response.Listener<String> { response ->
+                    Log.i("정보태그", "(chk_double)response=>$response")
+
+                    val jsonParser = JsonParser()
+                    val jsonElement: JsonElement = jsonParser.parse(response)
+
+                    result = jsonElement.getAsJsonObject().get("result").getAsString()
+                    Log.i("정보태그", "통신결과=>$result")
+
+                    if (result == "success") {
+                        val row = jsonElement.asJsonObject["row"]
+                        val gson = Gson()
+                        val map = gson.fromJson<Map<*, *>>(
+                            row.toString(),
+                            MutableMap::class.java
+                        )
+                        Log.i("정보태그", "[Get_member_info]row=>" + map["nickname"])
+                        memberInfo["nickname"] = map["nickname"].toString()
+                        memberInfo["snsid"] = map["snsid"].toString()
+                        memberInfo["profile_url"] = map["profile_url"].toString()
+                        memberInfo["sender_id"] = map["sender_id"].toString()
+
+
+                    } else {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.toast_error),
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                    }
+
+                    continuation.resume(response)
+                },
+                Response.ErrorListener { error ->
+                    val networkResponse = error.networkResponse
+                    if (networkResponse != null && networkResponse.data != null) {
+                        val jsonError = String(networkResponse.data)
+                        Log.d("정보태그", "onErrorResponse: $jsonError")
+                    }
+                    continuation.resumeWithException(error)
+                }) {
+                @Throws(AuthFailureError::class)
+                override fun getParams(): Map<String, String> {
+                    val params: MutableMap<String, String> = HashMap()
+                    Log.i("정보태그", "")
+                    params["accept_sort"] = "Get_member_info"
+                    params["email"] = email
+                    return params
+                }
+            }
+
+            request.setShouldCache(false)
+            appHelper.requestQueue = Volley.newRequestQueue(context)
+            appHelper.requestQueue!!.add(request)
+        }
+
+        return memberInfo
     }
 
 

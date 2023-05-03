@@ -20,4 +20,8 @@ interface  UserDao {
 
     @Query("DELETE FROM user")
     fun clearAllUsers()
+
+    @Query("UPDATE user SET nickname = :newNickname WHERE email = :email")
+    fun updateUserNickName(email: String, newNickname: String)
+
 }

@@ -9,6 +9,9 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.room.Room
+import com.example.books_ko.DataBase.UserDatabase
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.databinding.ActivityMainBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -19,12 +22,16 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     val am = AboutMember
     val actvity = this
+    private lateinit var database : UserDatabase
 
     /*
     구글로그인
@@ -39,6 +46,14 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // user데이터베이스에 있는 모든 정보 삭제
+        database = Room.databaseBuilder(applicationContext, UserDatabase::class.java, "app_database").build()
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                database.userDao().clearAllUsers()
+            }
+        }
 
 
         FirebaseApp.initializeApp(applicationContext) // firebase앱초기화

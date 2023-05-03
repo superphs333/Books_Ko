@@ -1,5 +1,7 @@
 package com.example.books_ko
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -75,7 +77,7 @@ class Activity_Find_Pw : AppCompatActivity() {
                                     "이메일이 전송되었습니다!",
                                     Toast.LENGTH_LONG
                                 ).show()
-                                set_validate_email=true
+                                validate_email = binding.editEmail.text.toString()
                             }
                         } catch (e: SendFailedException) {
                             withContext(Dispatchers.Main) {
@@ -115,10 +117,6 @@ class Activity_Find_Pw : AppCompatActivity() {
                     ).show()
                     return
                 }
-                if(set_validate_email){
-                    // 인증된 이메일 셋팅
-                    validate_email = binding.editEmail.text.toString()
-                }
             }
         },"findPw")
     }
@@ -147,6 +145,15 @@ class Activity_Find_Pw : AppCompatActivity() {
                 .show()
             return
         }
+
+        // 페이지 이동
+        val intent = Intent(applicationContext, Activity_Change_Pw::class.java)
+        intent.putExtra("email", validate_email)
+        intent.putExtra("from", "findPw")
+        finish()
+        startActivity(intent)
+
+
 
     }
 }
