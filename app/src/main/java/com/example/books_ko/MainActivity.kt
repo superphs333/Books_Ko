@@ -51,7 +51,15 @@ class MainActivity : AppCompatActivity() {
         database = Room.databaseBuilder(applicationContext, UserDatabase::class.java, "app_database").build()
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                database.userDao().clearAllUsers()
+                if(database.userDao().getUser2().auto_login){// 자동로그인 상태 -> 페이지 이동
+                    Log.i("정보태그","자동로그인")
+                    val intent = Intent(applicationContext, Activity_Main2::class.java)
+                    startActivity(intent)
+                    finish()
+                }else{
+                    Log.i("정보태그","자동로그인x")
+                    database.userDao().clearAllUsers()
+                }
             }
         }
 
@@ -99,6 +107,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        /*
+        자동로그인 여부
+         */
 
 
 
