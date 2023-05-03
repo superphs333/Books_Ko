@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
@@ -244,7 +245,7 @@ object AboutMember{
     }
 
     // 가져오고 싶은 정보를 받고 해당 정보를 return해줌
-    private suspend fun getMemberInfo(context: Context, email: String, to_get: String): String {
+     suspend fun getMemberInfo(context: Context, email: String, to_get: String): String {
         val url = context.getString(R.string.server_url) + "About_Member.php"
         var result = ""
 
@@ -500,7 +501,9 @@ object AboutMember{
                     // LiveData를 사용하여 데이터 변경 시 UI 업데이트
                    userLiveData.observe(activity, Observer { userData ->
                         if(userData != null){  // 나머지 => 해당 액티비티만 finish
-
+                            activity.lifecycleScope.launch {
+                                (activity as Activity).finish()
+                            }
                         }else{ // 비밀번호 찾기->비밀번호 변경으로 온 경우 => 메인페이지 이동
                             context?.let {
                                 val intent = Intent(it, MainActivity::class.java)

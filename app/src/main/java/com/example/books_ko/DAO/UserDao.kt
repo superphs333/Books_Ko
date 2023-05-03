@@ -12,6 +12,12 @@ interface  UserDao {
     @Query("SELECT * FROM user")
     fun getUser(): LiveData<UserData>
 
+    @Query("SELECT * FROM user")
+    fun getUser2(): UserData
+
+    @Query("SELECT email FROM user")
+    fun getUserEmail(): String
+
     @Query("SELECT * FROM user WHERE email = :email")
     fun getUserByEmail(email: String): LiveData<UserData?>
 
