@@ -40,6 +40,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".Activity_Setting"
+            android:exported="false" />
+        <activity
             android:name=".Activity_Change_Pw"
             android:exported="false" />
         <activity
