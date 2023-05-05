@@ -1,59 +1,110 @@
 package com.example.books_ko
 
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import androidx.fragment.app.Fragment
+import com.example.books_ko.Function.AboutMember
+import com.example.books_ko.databinding.FragmentBooksBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [Fragment_Books.newInstance] factory method to
- * create an instance of this fragment.
- */
-class Fragment_Books : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+class Fragment_Books : Fragment(), View.OnClickListener {
+
+    private var binding : FragmentBooksBinding? = null
+    private lateinit var context: Context
+    private lateinit var activity: Activity
+    val am = AboutMember
+
+    // FAB
+    var fab_open: Animation? = null
+    var fab_close: Animation? = null
+    var openFlag = false
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment__books, container, false)
+        binding = FragmentBooksBinding.inflate(layoutInflater, container, false)
+        val view: View = binding!!.getRoot()
+
+
+        activity = requireActivity()
+        context = requireContext()
+
+        /*
+        floating버튼 설정
+         */
+        fab_open = AnimationUtils.loadAnimation(context,R.anim.fab_open)
+        fab_close = AnimationUtils.loadAnimation(context, R.anim.fab_close)
+        // 버튼 상태 초기화(닫혀있어야 함)
+        binding!!.floatingSelf.startAnimation(fab_close)
+        binding!!.floatingSearch.startAnimation(fab_close)
+        // 초기 클릭 불가능
+        binding!!.floatingSelf.isClickable = false
+        binding!!.floatingSearch.isClickable = false
+        // 클릭시 동작
+        binding!!.floating.setOnClickListener(this)
+        binding!!.floatingSelf.setOnClickListener(this)
+        binding!!.floatingSearch.setOnClickListener(this)
+
+
+
+
+        return binding?.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Fragment_Books.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            Fragment_Books().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onClick(v: View?) {
+        val id = v!!.id
+        when (id) {
+            R.id.floating -> {
+                val builder = AlertDialog.Builder(context)
+                val str = arrayOf("직접추가", "도서검색")
+                builder.setTitle("어떤 방식으로 도서를 추가하시겠습니까?")
+                    .setNegativeButton("취소", null)
+                    .setItems(
+                        str
+                    )  // 리스트 목록에 사용할 배열
+                    { dialog, which ->
+                        Log.d("정보태그", "선택된것=" + str[which])
+                        if (str[which] == "직접추가") { // 직접추가
+                            Log.i("정보태그","선택->직접추가")
+
+//                            val intent2 = Intent(context, Activity_Book_Add::class.java)
+//                            startActivity(intent2)
+                        } else { // 도서찾기
+                            Log.i("정보태그","선택->도서검색")
+//                            val intent = Intent(context, Activity_Book_Search::class.java)
+//                            startActivity(intent)
+                        }
+                    }
+                val dialog = builder.create()
+                dialog.show()
             }
+            R.id.floating_search -> {
+                // why_change 값이 "reason2"일 때 수행할 로직
+                // ...
+            }
+            R.id.floating_self -> {
+                // why_change 값이 "reason3"일 때 수행할 로직
+                // ...
+            }
+        }
+
     }
+
 }
