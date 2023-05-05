@@ -27,4 +27,11 @@
     <!--  platform type  -->
     <string name="normal">normal</string>
     <string name="google">google</string>
+
+    <!--
+    카카오 관련 키
+    -->
+    <!-- REST API -->
+    <string name="kakao_restapi">6c7ae160cacb9ea503f1cac5d85be19a</string>
+    <string name="Authorization">KakaoAK 6c7ae160cacb9ea503f1cac5d85be19a</string>
 </resources>

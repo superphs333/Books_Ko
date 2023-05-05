@@ -88,8 +88,8 @@ class Fragment_Books : Fragment(), View.OnClickListener {
 //                            startActivity(intent2)
                         } else { // 도서찾기
                             Log.i("정보태그","선택->도서검색")
-//                            val intent = Intent(context, Activity_Book_Search::class.java)
-//                            startActivity(intent)
+                            val intent = Intent(context, Activity_Book_Search::class.java)
+                            startActivity(intent)
                         }
                     }
                 val dialog = builder.create()
