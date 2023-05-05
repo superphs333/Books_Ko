@@ -9,11 +9,13 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.example.books_ko.Data.UserData
 import com.example.books_ko.DataBase.UserDatabase
 import com.example.books_ko.databinding.ActivitySettingBinding
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -22,6 +24,7 @@ import kotlinx.coroutines.withContext
 private lateinit var binding: ActivitySettingBinding
 private lateinit var database : UserDatabase
 var email=""
+private var mAuth: FirebaseAuth? = null
 
 
 class Activity_Setting : AppCompatActivity() {
@@ -96,6 +99,35 @@ class Activity_Setting : AppCompatActivity() {
                     })
                 alert.show()
             }
+        }
+    }
+
+    // 로그아웃
+    fun logout(view: View){
+        mAuth = FirebaseAuth.getInstance()
+        val currentUser = mAuth!!.currentUser
+        if(currentUser!=null){
+            Log.i("정보태그","구글로 로그인 한 회원")
+            // 구글로 로그인 한 회원
+            FirebaseAuth.getInstance().signOut()
+        }else{ // 이 아래부분은 일반 로그인 분기 잘 타는지 확인 후 지워도 됨
+            Log.i("정보태그","일반 로그인 한 회원")
+
+        }
+        delete_and_intent()
+    }
+
+    private fun delete_and_intent() {
+        // 데이터베이스에 저장되어 있는 user정보 삭제
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                database = Room.databaseBuilder(applicationContext, UserDatabase::class.java, "app_database").build()
+                database.userDao().clearAllUsers()
+            }
+            // MainAcitvity 페이지로 이동
+            val intent = Intent(applicationContext, MainActivity::class.java)
+            ActivityCompat.finishAffinity(this@Activity_Setting)
+            startActivity(intent)
         }
     }
 }

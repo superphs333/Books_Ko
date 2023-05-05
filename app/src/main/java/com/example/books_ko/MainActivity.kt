@@ -9,6 +9,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.example.books_ko.DataBase.UserDatabase
@@ -45,24 +46,49 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        // user데이터베이스에 있는 모든 정보 삭제
+        Log.i("정보태그","MainActivity onCreate")
+
+
+        // 자동로그인 / user데이터베이스에 있는 모든 정보 삭제
         database = Room.databaseBuilder(applicationContext, UserDatabase::class.java, "app_database").build()
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                if(database.userDao().getUser2().auto_login){// 자동로그인 상태 -> 페이지 이동
-                    Log.i("정보태그","자동로그인")
+        val userLiveData = database.userDao().getUser()
+        userLiveData.observe(this, Observer { user ->
+            if (user != null) {
+                // 데이터가 있다면 정보 출력
+                Log.d("정보태그", "Email: ${user.email}, Nickname: ${user.nickname}, Auto Login: ${user.auto_login}")
+                // 자동 로그인 여부 확인
+                if (user.auto_login) { // 자동로그인
+                    Log.i("정보태그", "자동로그인")
                     val intent = Intent(applicationContext, Activity_Main2::class.java)
                     startActivity(intent)
                     finish()
-                }else{
-                    Log.i("정보태그","자동로그인x")
-                    database.userDao().clearAllUsers()
+                } else { // 자동로그인 x
+                    Log.i("정보태그", "자동로그인x")
+                    lifecycleScope.launch {
+                        withContext(Dispatchers.IO) {
+                            database.userDao().clearAllUsers()
+                        }
+                    }
+                    setContentView(binding.root)
                 }
+            } else {
+                Log.i("정보태그", "데이터 없음")
+                setContentView(binding.root)
             }
-        }
-
+        })
+//                if (userLiveData.value?.auto_login == true) {// 자동로그인 상태 -> 페이지 이동
+//                    Log.i("정보태그", "자동로그인")
+//                    val intent = Intent(applicationContext, Activity_Main2::class.java)
+//                    startActivity(intent)
+//                    finish()
+//                } else if (userLiveData.value == null){
+//                    Log.i("정보태그", "자동로그인x_user정보 없음")
+//                    database.userDao().clearAllUsers()
+//                }else {
+//                    Log.i("정보태그", "자동로그인x")
+//                    database.userDao().clearAllUsers()
+//                }
 
         FirebaseApp.initializeApp(applicationContext) // firebase앱초기화
         /*
@@ -75,6 +101,8 @@ class MainActivity : AppCompatActivity() {
             .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
         mAuth = FirebaseAuth.getInstance(); // Initialize Firebase Auth
+
+
         // 로그인 버튼
         binding.signInButton.setOnClickListener {
             Log.i("정보태그", "(button)login_google")
@@ -108,9 +136,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        /*
-        자동로그인 여부
-         */
+
+    }
+
+    override fun onStart() {
+        super.onStart()
 
 
 
