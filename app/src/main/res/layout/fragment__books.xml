@@ -56,7 +56,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_my_books"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></androidx.recyclerview.widget.RecyclerView>
+            android:layout_height="match_parent" />
 
         <!-- 플로팅 버튼 부분 -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -94,13 +94,4 @@
             app:layout_anchorGravity="bottom|end" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
-
-
-
-
-
-
-
 </LinearLayout>

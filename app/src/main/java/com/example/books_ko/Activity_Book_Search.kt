@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.books_ko.Adapter.AdapterSearchBook
 import com.example.books_ko.Data.Data_Search_Book
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.databinding.ActivityBookSearchBinding
@@ -19,8 +21,14 @@ class Activity_Book_Search : AppCompatActivity() {
     private lateinit var binding: ActivityBookSearchBinding
 
     // 도서
-    val arrayList: ArrayList<Data_Search_Book> = ArrayList()
+    var arrayList: ArrayList<Data_Search_Book>? = null
         // 이렇게 초기화를 해주어야 arrayList에 객체가 담겨짐
+
+    /*
+    리사이클러뷰
+     */
+    var  mainAdapter: AdapterSearchBook? = null
+    lateinit var linearLayoutManager:LinearLayoutManager
 
 
 
@@ -28,11 +36,14 @@ class Activity_Book_Search : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityBookSearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        arrayList = ArrayList();
+
+
     }
 
     open fun search_book(view: View?){
         // arrayList초기화
-       // arrayList.clear()
+        arrayList?.clear()
 
         val url =
             "https://dapi.kakao.com" + "/v3/search/book?query=" + binding.editSearch.text.toString()
@@ -69,16 +80,22 @@ class Activity_Book_Search : AppCompatActivity() {
                     tempDataSearchBook.isbn = if (string_array[0].isBlank()) string_array[1] else string_array[0]  // 만약, 10자리 isbn이 없다면 13자리 isbn사용
                     // 그외 정보
                     tempDataSearchBook.publisher = temp_object.getString("publisher")
-                    tempDataSearchBook.publisher = temp_object.getString("thumbnail")
-                    tempDataSearchBook.publisher = temp_object.getString("title")
-                    tempDataSearchBook.publisher = temp_object.getString("url")
+                    tempDataSearchBook.thumbnail = temp_object.getString("thumbnail")
+                    tempDataSearchBook.title = temp_object.getString("title")
+                    tempDataSearchBook.url = temp_object.getString("url")
 
                     // 리스트에 객체 넣기
-                    arrayList.add(tempDataSearchBook)
+                    arrayList?.add(tempDataSearchBook)
                     Log.i("정보태그", "tempDataSearchBook->$tempDataSearchBook")
 
                 }
                 Log.i("정보태그", "도서 담기 완료, arrayList->$arrayList")
+                // 리사이클러뷰에 셋팅
+                mainAdapter = AdapterSearchBook(arrayList!!,applicationContext,this@Activity_Book_Search)
+                binding.rvBooks.adapter = mainAdapter
+                linearLayoutManager = LinearLayoutManager(applicationContext)
+                linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
+                binding.rvBooks.layoutManager = linearLayoutManager
 
 
 
