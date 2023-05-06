@@ -40,6 +40,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".Activity_PopUp_in_Search_Book"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/popupTheme"
+            android:exported="false" />
+        <activity
             android:name=".Activity_Book_URL"
             android:exported="false" />
         <activity

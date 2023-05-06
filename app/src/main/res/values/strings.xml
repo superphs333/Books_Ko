@@ -34,4 +34,5 @@
     <!-- REST API -->
     <string name="kakao_restapi">6c7ae160cacb9ea503f1cac5d85be19a</string>
     <string name="Authorization">KakaoAK 6c7ae160cacb9ea503f1cac5d85be19a</string>
+    <string name="before_add_book">이미 등록되어 있는 도서입니다</string>
 </resources>

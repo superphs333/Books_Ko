@@ -15,4 +15,15 @@
         <item name = "android:layout_gravity">center_horizontal</item>
     </style>
 
+    <!-- 팝업부분 -->
+    <style name="popupTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <!--타이틀 바 제거-->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
 </resources>

@@ -11,6 +11,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.books_ko.Adapter.AdapterSearchBook
 import com.example.books_ko.Data.Data_Search_Book
+import com.example.books_ko.Function.AboutBook
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.databinding.ActivityBookSearchBinding
 import org.json.JSONObject
@@ -21,6 +22,7 @@ class Activity_Book_Search : AppCompatActivity() {
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var adapter: AdapterSearchBook
     private var bookList: ArrayList<Data_Search_Book> = ArrayList()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

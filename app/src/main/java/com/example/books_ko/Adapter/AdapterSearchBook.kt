@@ -9,19 +9,23 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.books_ko.Activity_Book_URL
 
 
 import com.example.books_ko.Data.Data_Search_Book
+import com.example.books_ko.Function.AboutBook
 import com.example.books_ko.databinding.ItemSearchBookBinding
 
 class AdapterSearchBook(
     var dataSearchBooks: ArrayList<Data_Search_Book> = ArrayList(),
-    context: Context,
-    private val activity: Activity
+    private val context: Context,
+    private val activity : Activity
 ) : RecyclerView.Adapter<AdapterSearchBook.CustomViewHolder>() {
+
+    val ab = AboutBook
 
 
 
@@ -74,10 +78,12 @@ class AdapterSearchBook(
                         )
                         activity.startActivity(intent)
                     } else {
-//                        ab.Check_in_mybook(
-//                            dataSearchBooks.get(holder.getAbsoluteAdapterPosition()).url,
-//                            dataSearchBooks.get(holder.getAbsoluteAdapterPosition())
-//                        )
+                        ab.Check_in_mybook(
+                            context,
+                            activity as LifecycleOwner,
+                            dataSearchBooks.get(holder.getAbsoluteAdapterPosition()).url,
+                            dataSearchBooks.get(holder.getAbsoluteAdapterPosition())
+                        )
                     }
                 }
             val dialog = builder.create()
