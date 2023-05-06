@@ -1,5 +1,6 @@
 package com.example.books_ko
 
+import Data_Search_Book
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,8 +11,6 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.books_ko.Adapter.AdapterSearchBook
-import com.example.books_ko.Data.Data_Search_Book
-import com.example.books_ko.Function.AboutBook
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.databinding.ActivityBookSearchBinding
 import org.json.JSONObject
@@ -64,13 +63,14 @@ class Activity_Book_Search : AppCompatActivity() {
                         tempObject.getString("authors").replace("\\[".toRegex(), "")
                             .replace("\\]".toRegex(), "").replace("\"".toRegex(), "")
                     val contents = tempObject.getString("contents")
-                    val isbn = if (tempObject.getString("isbn").length == 10) tempObject.getString("isbn") else tempObject.getString("isbn")
+                    // isbn -> 분기
+                    val stringArray = tempObject.getString("isbn").split(" ")
+                    // 만약, 10자리 isbn이 없다면 13자리 isbn 사용
+                    val isbn = if (stringArray[0].isEmpty()) stringArray[1] else stringArray[0]
                     val publisher = tempObject.getString("publisher")
                     val thumbnail = tempObject.getString("thumbnail")
                     val title = tempObject.getString("title")
                     val url = tempObject.getString("url")
-                    Log.i("정보태그","url->"+url)
-
 
                     bookList.add(Data_Search_Book(isbn,title, authors, publisher, thumbnail, contents, "Kakao",isbn, url))
                 }

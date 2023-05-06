@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="read_status">
+        <item>읽고싶은</item>
+        <item>읽는중</item>
+        <item>읽음</item>
+    </string-array>
+
+    <string-array name="read_status_books">
+        <item>전체</item>
+        <item>읽고싶은</item>
+        <item>읽는중</item>
+        <item>읽음</item>
+    </string-array>
+
+    <string-array name="select_open">
+        <item>전체</item>
+        <item>팔로잉</item>
+        <item>비공개</item>
+    </string-array>
+
+    <string-array name="select_open2">
+        <item>전체</item>
+        <item>팔로우</item>
+    </string-array>
+
+    <!--  채팅룸 선택  -->
+    <string-array name="select_chatting_room_view">
+        <item>전체</item>
+        <item>참여중</item>
+        <item>대기중</item>
+    </string-array>
+
+    <!--  메모 선택  -->
+    <string-array name="select_memo_view">
+        <item>전체</item>
+        <item>팔로우</item>
+        <item>내메모</item>
+    </string-array>
+</resources>

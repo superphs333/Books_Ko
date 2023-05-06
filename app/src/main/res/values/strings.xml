@@ -34,5 +34,21 @@
     <!-- REST API -->
     <string name="kakao_restapi">6c7ae160cacb9ea503f1cac5d85be19a</string>
     <string name="Authorization">KakaoAK 6c7ae160cacb9ea503f1cac5d85be19a</string>
+
+
+    <!--
+    read표시
+     -->
+    <string name="read_bucket">읽고싶은</string>
+    <string name="read_reading">읽는중</string>
+    <string name="read_end">읽음</string>
+
+    <!--
+    도서관련
+    -->
     <string name="before_add_book">이미 등록되어 있는 도서입니다</string>
+    <string name="save_in_my_book">나의 도서로 등록되었습니다</string>
+    <string name="edit_book">수정되었습니다</string>
+    <string name="check_delete">정말로 삭제하시겠습니까?</string>
+    <string name="delete_my_book">나의 도서에서 삭제되었습니다.</string>
 </resources>

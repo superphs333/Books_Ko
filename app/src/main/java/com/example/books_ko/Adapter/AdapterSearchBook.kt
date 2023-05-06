@@ -1,9 +1,11 @@
 package com.example.books_ko.Adapter
 
+import Data_Search_Book
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -15,7 +17,7 @@ import com.bumptech.glide.Glide
 import com.example.books_ko.Activity_Book_URL
 
 
-import com.example.books_ko.Data.Data_Search_Book
+
 import com.example.books_ko.Function.AboutBook
 import com.example.books_ko.databinding.ItemSearchBookBinding
 
@@ -81,7 +83,7 @@ class AdapterSearchBook(
                         ab.Check_in_mybook(
                             context,
                             activity as LifecycleOwner,
-                            dataSearchBooks.get(holder.getAbsoluteAdapterPosition()).url,
+                            dataSearchBooks.get(holder.getAbsoluteAdapterPosition()).isbn,
                             dataSearchBooks.get(holder.getAbsoluteAdapterPosition())
                         )
                     }

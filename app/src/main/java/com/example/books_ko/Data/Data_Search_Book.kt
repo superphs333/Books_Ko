@@ -1,7 +1,8 @@
-package com.example.books_ko.Data
+import android.os.Parcel
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-import java.io.Serializable
-
+@Parcelize
 data class Data_Search_Book(
     var unique_book_value: String = "",
     var title: String = "",
@@ -12,4 +13,4 @@ data class Data_Search_Book(
     var from_: String = "",
     var isbn: String = "",
     var url: String = ""
-) : Serializable
+) : Parcelable

@@ -1,7 +1,9 @@
 package com.example.books_ko.Function
 
+import Data_Search_Book
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
@@ -13,7 +15,6 @@ import com.android.volley.toolbox.Volley
 import com.example.books_ko.Activity_PopUp_in_Search_Book
 import com.example.books_ko.Activity_Set_nickname
 import com.example.books_ko.Class.AppHelper
-import com.example.books_ko.Data.Data_Search_Book
 import com.example.books_ko.DataBase.UserDatabase
 import com.example.books_ko.R
 import com.google.gson.JsonElement
@@ -72,7 +73,8 @@ object AboutBook {
                         ).show()
                     } else { // 등록하지 않은 도서 -> 등록
                         val intent = Intent(context, Activity_PopUp_in_Search_Book::class.java)
-                        intent.putExtra("book", DSB as Serializable)
+                        intent.putExtra("book", DSB)
+                        intent.putExtra("email", email)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         context.startActivity(intent)
                     }
