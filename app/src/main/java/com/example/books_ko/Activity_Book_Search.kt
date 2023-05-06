@@ -67,8 +67,10 @@ class Activity_Book_Search : AppCompatActivity() {
                     val thumbnail = tempObject.getString("thumbnail")
                     val title = tempObject.getString("title")
                     val url = tempObject.getString("url")
+                    Log.i("정보태그","url->"+url)
 
-                    bookList.add(Data_Search_Book(isbn, title, authors, publisher, thumbnail, contents, "Kakao", url))
+
+                    bookList.add(Data_Search_Book(isbn,title, authors, publisher, thumbnail, contents, "Kakao",isbn, url))
                 }
                 Log.i("정보태그", "도서 담기 완료, arrayList->$bookList")
                 adapter.notifyDataSetChanged()
