@@ -21,6 +21,7 @@ import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.databinding.FragmentBooksBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 
@@ -128,19 +129,16 @@ class Fragment_Books : Fragment(), View.OnClickListener {
         돋보기 버튼(img_search) -> 적절한 데이터 불러오기
          */
         binding!!.imgSearch.setOnClickListener { // 데이터 불러오기
-            CoroutineScope(Dispatchers.Main).launch {
+            GlobalScope.launch(Dispatchers.Main) {
+                arrayList!!.clear()
+                adapterMyBook.notifyDataSetChanged()
                 // 도서 데이터 불러오기
                 arrayList = ab.getMyBook(context,email,getReadStatus(),binding!!.editSearch.getText().toString())
                 Log.i("정보태그","arrayList->$arrayList")
-
-                arrayList!!.clear()
+                adapterMyBook.dataMyBooks = arrayList!!
                 adapterMyBook.notifyDataSetChanged()
-
             }
         }
-
-
-
 
         return binding?.root
     }
