@@ -9,6 +9,5 @@ data class ApiData (
     val move: String? = null,
     val pw: String? = null,
     val sql_insert: String? = null,
-
         )
 

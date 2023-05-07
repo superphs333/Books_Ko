@@ -564,8 +564,6 @@ class Activity_Signup : AppCompatActivity() {
                 Log.i("정보태그",t.message.toString())
             }
         })
-
-
     }
 
 
