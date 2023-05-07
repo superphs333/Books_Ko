@@ -4,6 +4,8 @@ import com.example.books_ko.ApiResponse
 import com.example.books_ko.Data.ApiData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
@@ -35,4 +37,14 @@ interface JsonPlaceHolderApi {
         @Part("status") status: RequestBody,
         @Part uploadedfile: MultipartBody.Part
     ): retrofit2.Call<ApiResponse<ApiData>>
+
+    @FormUrlEncoded
+    @POST("About_Book.php")
+    fun getMyBook(
+        @Field("accept_sort") accept_sort : String ,
+        @Field("email") email : String ,
+        @Field("status") status : Int ,
+        @Field("search") search : String
+    ): retrofit2.Call<ApiResponse<ApiData>>
+
 }

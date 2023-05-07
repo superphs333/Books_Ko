@@ -11,9 +11,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import com.example.books_ko.Data.DataMyBook
+import com.example.books_ko.Function.AboutBook
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.databinding.FragmentBooksBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class Fragment_Books : Fragment(), View.OnClickListener {
@@ -22,17 +30,50 @@ class Fragment_Books : Fragment(), View.OnClickListener {
     private lateinit var context: Context
     private lateinit var activity: Activity
     val am = AboutMember
+    val ab = AboutBook
+    var email = ""
+
 
     // FAB
     var fab_open: Animation? = null
     var fab_close: Animation? = null
     var openFlag = false
 
+    var arrayList: ArrayList<DataMyBook>? = null
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+
+        CoroutineScope(Dispatchers.Main).launch {
+            email = am.getEmailFromRoom(context)
+            Log.i("정보태그","email->"+email)
+            // 도서 데이터 불러오기
+            arrayList = ab.getMyBook(context,email,getReadStatus(),binding!!.editSearch.getText().toString())
+            Log.i("정보태그","arrayList->$arrayList")
+        }
+
+    }
+
+    private fun getReadStatus():Int{
+        val status: Int = when(binding!!.categoryReadStatus.selectedItem.toString()){
+            getString(R.string.read_bucket) -> 3
+            getString(R.string.read_reading) -> 1
+            getString(R.string.read_end) -> 2
+            else -> 4
+        }
+        Log.i("정보태그", "read_status=>$status")
+        return status
     }
 
     override fun onCreateView(
@@ -61,6 +102,13 @@ class Fragment_Books : Fragment(), View.OnClickListener {
         binding!!.floating.setOnClickListener(this)
         binding!!.floatingSelf.setOnClickListener(this)
         binding!!.floatingSearch.setOnClickListener(this)
+
+        /*
+        카테고리 값 셋팅
+         */
+        val data = context.resources.getStringArray(R.array.read_status_books)
+        val adapter = ArrayAdapter(context,android.R.layout.simple_dropdown_item_1line,data)
+        binding!!.categoryReadStatus.adapter = adapter
 
 
 

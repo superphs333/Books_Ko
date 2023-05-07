@@ -28,6 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.regex.Pattern
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -70,6 +71,12 @@ object AboutMember{
         var check = Pattern.matches(regex,text)
         Log.i("정보태그", "정규식결과(chk_regex)=>$check")
         return check;
+    }
+
+    // 이메일 가져오기
+    suspend fun getEmailFromRoom(context: Context): String = withContext(Dispatchers.IO) {
+        val database = Room.databaseBuilder(context, UserDatabase::class.java, "app_database").build()
+        return@withContext database.userDao().getUser2().email
     }
 
     // 닉네임, 이메일 중복 체크

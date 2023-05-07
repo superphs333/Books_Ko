@@ -3,7 +3,6 @@ package com.example.books_ko.Function
 import Data_Search_Book
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
@@ -13,9 +12,12 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.books_ko.Activity_PopUp_in_Search_Book
-import com.example.books_ko.Activity_Set_nickname
+import com.example.books_ko.ApiResponse
 import com.example.books_ko.Class.AppHelper
+import com.example.books_ko.Data.ApiData
+import com.example.books_ko.Data.DataMyBook
 import com.example.books_ko.DataBase.UserDatabase
+import com.example.books_ko.Interface.JsonPlaceHolderApi
 import com.example.books_ko.R
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
@@ -23,17 +25,26 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.Serializable
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 
 object AboutBook {
     val appHelper = AppHelper();
-    private lateinit var database : UserDatabase
+    private lateinit var database: UserDatabase
 
 
     /*
     이미 등록되어 있는 책인지 확인한다 -> 등록되어 있지 않은 경우 내 도서에 저장
      */
-    fun Check_in_mybook(context: Context, activity: LifecycleOwner, isbn:String,DSB : Data_Search_Book) {
+    fun Check_in_mybook(
+        context: Context,
+        activity: LifecycleOwner,
+        isbn: String,
+        DSB: Data_Search_Book
+    ) {
         database = Room.databaseBuilder(context, UserDatabase::class.java, "app_database").build()
 
         // 1. 코루틴 스코프 생성
@@ -106,4 +117,37 @@ object AboutBook {
             AboutMember.appHelper.requestQueue!!.add(request)
         }
     }
+
+    suspend fun getMyBook(
+        context: Context,
+        email: String,
+        Inputstatus: Int,
+        search: String
+    ): ArrayList<DataMyBook>? = withContext(Dispatchers.IO) {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(context.getString(R.string.server_url))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val myApi = retrofit.create(JsonPlaceHolderApi::class.java)
+        val accept_sort = "My_Books"
+
+        try {
+            val response = myApi.getMyBook(accept_sort, email, Inputstatus, search).execute()
+            if (response.isSuccessful) {
+                val result = response.body()
+                if (result?.status == "success"){
+                    response.body()?.data?.bookList as ArrayList<DataMyBook>?
+                } else {
+                    Log.i("정보태그", "[getMyBook]서버에 연결은 되었으나 오류발생")
+                    null
+                }
+            } else {
+                Log.i("정보태그", "[getMyBook]result.staus isSuccessful X")
+                null
+            }
+        } catch (e: IOException) {
+            null
+        }
+    }
 }
+
