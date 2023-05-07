@@ -51,4 +51,44 @@
     <string name="edit_book">수정되었습니다</string>
     <string name="check_delete">정말로 삭제하시겠습니까?</string>
     <string name="delete_my_book">나의 도서에서 삭제되었습니다.</string>
+
+    <!--
+    폴더
+    -->
+    <!-- 프로필이미지 -->
+    <string name="img_profile">Img_Profile</string>
+    <!-- 북커버 -->
+    <string name="img_book">Img_Book_Cover</string>
+    <!-- 메모 사진 이미지 -->
+    <string name="img_memo">Img_Book_Memo</string>
+    <!-- 채팅 사진 이미지 -->
+    <string name="img_chat">Img_Chatting</string>
+
+    <!--
+    Notification Channel ID
+    -->
+    <string name="Channel_ID_Chatting_Room">Chatting_Room</string>
+    <string name="Channel_ID_Chatting">Chatting</string>
+    <string name="Channel_ID_SNS">SNS</string>
+    <string name="Channel_ID_Chatting_Wating">Chatting_Wating</string>
+    <string name="Channel_ID_Follow">Follow</string>
+
+    <!--
+메모관련
+-->
+    <string name="add_memo">메모가 등록되었습니다</string>
+    <string name="edit_memo">메모가 수정되었습니다</string>
+
+    <!--
+    채팅방 관련
+    -->
+    <string name="save_chatting_room">채팅방이 생성되었습니다.</string>
+    <string name="edit_chatting_room">채팅방이 수정되었습니다.</string>
+    <string name="delete_chatting_room">채팅방이 삭제되었습니다.</string>
+
+    <!--
+일반
+-->
+    <string name="delete">삭제</string>
+    <string name="update">수정</string>
 </resources>
