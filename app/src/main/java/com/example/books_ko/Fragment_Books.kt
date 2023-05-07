@@ -13,7 +13,8 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.books_ko.Adapter.AdapterMyBook
 import com.example.books_ko.Data.DataMyBook
 import com.example.books_ko.Function.AboutBook
 import com.example.books_ko.Function.AboutMember
@@ -21,7 +22,6 @@ import com.example.books_ko.databinding.FragmentBooksBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class Fragment_Books : Fragment(), View.OnClickListener {
@@ -39,12 +39,15 @@ class Fragment_Books : Fragment(), View.OnClickListener {
     var fab_close: Animation? = null
     var openFlag = false
 
-    var arrayList: ArrayList<DataMyBook>? = null
+    var arrayList: ArrayList<DataMyBook>? = ArrayList()
+    private lateinit var adapterMyBook : AdapterMyBook
+    private lateinit var linearLayoutManager: LinearLayoutManager
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
 
 
@@ -61,6 +64,17 @@ class Fragment_Books : Fragment(), View.OnClickListener {
             // 도서 데이터 불러오기
             arrayList = ab.getMyBook(context,email,getReadStatus(),binding!!.editSearch.getText().toString())
             Log.i("정보태그","arrayList->$arrayList")
+
+            /*
+            리사이클러뷰 셋팅
+             */
+            linearLayoutManager = LinearLayoutManager(context)
+            adapterMyBook = AdapterMyBook(arrayList!!, context, activity)
+            binding!!.rvMyBooks.apply {
+                setHasFixedSize(true)
+                layoutManager = linearLayoutManager
+                adapter = adapterMyBook
+            }
         }
 
     }
@@ -107,8 +121,23 @@ class Fragment_Books : Fragment(), View.OnClickListener {
         카테고리 값 셋팅
          */
         val data = context.resources.getStringArray(R.array.read_status_books)
-        val adapter = ArrayAdapter(context,android.R.layout.simple_dropdown_item_1line,data)
+        var adapter = ArrayAdapter(context,android.R.layout.simple_dropdown_item_1line,data)
         binding!!.categoryReadStatus.adapter = adapter
+
+        /*
+        돋보기 버튼(img_search) -> 적절한 데이터 불러오기
+         */
+        binding!!.imgSearch.setOnClickListener { // 데이터 불러오기
+            CoroutineScope(Dispatchers.Main).launch {
+                // 도서 데이터 불러오기
+                arrayList = ab.getMyBook(context,email,getReadStatus(),binding!!.editSearch.getText().toString())
+                Log.i("정보태그","arrayList->$arrayList")
+
+                arrayList!!.clear()
+                adapterMyBook.notifyDataSetChanged()
+
+            }
+        }
 
 
 
