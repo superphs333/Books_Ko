@@ -84,8 +84,8 @@ class Fragment_Books : Fragment(), View.OnClickListener {
                         if (str[which] == "직접추가") { // 직접추가
                             Log.i("정보태그","선택->직접추가")
 
-//                            val intent2 = Intent(context, Activity_Book_Add::class.java)
-//                            startActivity(intent2)
+                            val intent2 = Intent(context, Activity_Book_Add::class.java)
+                            startActivity(intent2)
                         } else { // 도서찾기
                             Log.i("정보태그","선택->도서검색")
                             val intent = Intent(context, Activity_Book_Search::class.java)

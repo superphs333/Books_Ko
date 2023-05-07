@@ -45,6 +45,14 @@ object AboutPicture {
         return ""
     }
 
+    // 갤러리에서 이미지 1장 가져오기
+    fun galleryOnePictrue(resultLancher : ActivityResultLauncher<Intent>){
+        val intent = Intent()
+        intent.setType("image/*")
+        intent.setAction(Intent.ACTION_GET_CONTENT) // 이미지를 열 수 있는 앱을 호출
+        resultLancher.launch(intent)
+    }
+
     /*
     임시파일 변환하기
      */
