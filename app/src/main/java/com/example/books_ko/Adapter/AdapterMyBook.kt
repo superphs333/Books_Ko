@@ -3,6 +3,7 @@ package com.example.books_ko.Adapter
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.books_ko.Activity_Book_Add
 import com.example.books_ko.Data.DataMyBook
 import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.R
@@ -137,7 +139,19 @@ class AdapterMyBook (
 
                         }
                         selected == "수정" -> {
-
+                            val intent = Intent(context, Activity_Book_Add::class.java).apply {
+                                putExtra("idx", item.idx)
+                                putExtra("title", item.title)
+                                putExtra("authors", item.authors)
+                                putExtra("publisher", item.publisher)
+                                putExtra("isbn", item.isbn)
+                                putExtra("contents", item.contents)
+                                putExtra("review", item.review)
+                                putExtra("status", item.status)
+                                putExtra("rating", item.rating)
+                                putExtra("thumbnail", item.thumbnail)
+                            }
+                            context.startActivity(intent)
                         }
                     }
                 }

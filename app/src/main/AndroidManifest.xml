@@ -40,6 +40,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ActivityDetailMyBook"
+            android:exported="false" />
+        <activity
             android:name=".Activity_Book_Add"
             android:exported="false" />
         <activity
