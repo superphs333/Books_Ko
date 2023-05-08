@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.books_ko.ActivityDetailMyBook
 import com.example.books_ko.Activity_Book_Add
 import com.example.books_ko.Data.DataMyBook
 import com.example.books_ko.Function.FunctionCollection
@@ -157,6 +158,24 @@ class AdapterMyBook (
                 }
             val dialog = builder.create()
             dialog.show()
+        }
+
+        /*
+        클릭시 -> ActivityDetailMyBook 이동
+         */
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, ActivityDetailMyBook::class.java).apply {
+                putExtra("idx", item.idx)
+                putExtra("title", item.title)
+                putExtra("authors", item.authors)
+                putExtra("publisher", item.publisher)
+                putExtra("contents", item.contents)
+                putExtra("review", item.review)
+                putExtra("status", item.status)
+                putExtra("rating", item.rating)
+                putExtra("thumbnail", item.thumbnail)
+            }
+            context.startActivity(intent)
         }
 
 
