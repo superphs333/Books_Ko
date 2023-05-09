@@ -21,7 +21,8 @@ class ActivityDetailMyBook : AppCompatActivity() {
     var idx = 0
     var email = ""
 
-    private var isInitialized = false // spinner 초기화 여부
+    private var isInitializedSpinner = false // spinner 초기화 여부
+    private var isInitializedStar = false // 별점 초기화 여부
 
     val am = AboutMember
     val fc = FunctionCollection
@@ -40,6 +41,8 @@ class ActivityDetailMyBook : AppCompatActivity() {
 
         // intent에서 정보 불러오기
         idx = intent.getIntExtra("idx", 0)
+        Log.i("정보태그","[ActivityDetailMyBook]idx->"+idx)
+
 
         // email
         lifecycleScope.launch {
@@ -84,13 +87,12 @@ class ActivityDetailMyBook : AppCompatActivity() {
          */
         binding.categoryReadStatus.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
-                if (isInitialized) { // 초기화 이후에만 동작하도록 함
+                if (isInitializedSpinner) { // 초기화 이후에만 동작하도록 함
                     val status: Int = when (binding.categoryReadStatus.selectedItem.toString()) {
                         getString(R.string.read_bucket) -> 3
                         getString(R.string.read_reading) -> 1
                         else -> 2
                     }
-
                     /*
                     데이터베이스 반영
                      */
@@ -107,12 +109,29 @@ class ActivityDetailMyBook : AppCompatActivity() {
                         }
                     }
                 } else {
-                    isInitialized = true // 초기화 완료
+                    isInitializedSpinner = true // 초기화 완료
                 }
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {}
         }
+
+        binding.ratingBar.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
+                // 보낼값
+                val map: MutableMap<String, String> = HashMap()
+                map["sort"] = "rating" // 변경할 값
+                map["book_idx"] = idx.toString() // 책 idx
+                map["input"] = binding.ratingBar.rating.toString() // 변경할 값
+                map["email"] = email
+                lifecycleScope.launch {
+                    val goServer = fc.goServer(applicationContext, "edit_my_book", map)
+                    if(goServer){
+                        Toast.makeText(applicationContext, "별점 상태가 변경되었습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        }
+
+
 
     }
 
