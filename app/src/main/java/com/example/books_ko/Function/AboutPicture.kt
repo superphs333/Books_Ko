@@ -17,7 +17,7 @@ object AboutPicture {
 
     // 카메라에서 사진 가져오기
         // return : 파일 경로
-    fun cameraOnePicture(resultLauncher: ActivityResultLauncher<Intent>,context: Context): String {
+    fun cameraOnePicture(resultLauncher: ActivityResultLauncher<Intent>,context: Context,sort: String): String {
         // 카메라에서 이미지를 가져옴
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         val resolveActivity = intent.resolveActivity(context.packageManager)
@@ -25,7 +25,7 @@ object AboutPicture {
             // 1. 임의의 경로에 파일 만들기
             var photo_File: File? = null
             try{
-                photo_File = createImageFile(context);
+                photo_File = createImageFile(context,sort);
             }catch (e:Exception){
                 e.printStackTrace()
                 Log.d("정보태그", "createImageFile 오류=>" + e.message)
@@ -57,10 +57,10 @@ object AboutPicture {
     임시파일 변환하기
      */
     @Throws(IOException::class)
-    fun createImageFile(context: Context): File {
+    fun createImageFile(context: Context,sort: String): File {
         // 1. String prefix 부분
         val timeStamp  = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageFileName = "Profile_$timeStamp"+"_"
+        val imageFileName = "{$sort}_{$timeStamp}_"
         // 2. directory 부분(file)
         val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         // 3. 임시 파일 생성

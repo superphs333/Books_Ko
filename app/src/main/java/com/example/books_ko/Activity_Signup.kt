@@ -440,7 +440,7 @@ class Activity_Signup : AppCompatActivity() {
         Log.i("정보태그", "startCamera()실행!")
 
         // 임시파일 가져오고, 카메라로 전달
-        image_Uri = ap.cameraOnePicture(rl_camera!!, applicationContext)
+        image_Uri = ap.cameraOnePicture(rl_camera!!, applicationContext,getString(R.string.img_profile))
 
     }
 

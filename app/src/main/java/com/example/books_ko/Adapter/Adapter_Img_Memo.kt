@@ -2,11 +2,15 @@ package com.example.books_ko.Adapter
 
 import android.app.Activity
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.books_ko.Data.DataMyBook
 import com.example.books_ko.Data.Data_Img_Memo
+import com.example.books_ko.R
 import com.example.books_ko.databinding.ItemBookListBinding
 import com.example.books_ko.databinding.ItemImgMemoBinding
 
@@ -42,6 +46,15 @@ class Adapter_Img_Memo(
             notifyItemRangeChanged(position, dataMyBooks.size - position)
         }
          */
+        Log.i("정보태그","(onBindViewHolder)img->"+item.img)
+
+        if (item.img.contains(context.getString(R.string.img_memo))) {
+            Glide.with(holder.itemView.context)
+                .load(item.img)
+                .into(binding.imgMemo)
+        } else {
+            binding.imgMemo.setImageURI(Uri.parse(item.img))
+        }
     }
 
     override fun getItemCount(): Int {
