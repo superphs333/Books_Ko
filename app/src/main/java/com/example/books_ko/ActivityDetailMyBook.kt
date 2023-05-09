@@ -1,11 +1,15 @@
 package com.example.books_ko
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -27,6 +31,8 @@ class ActivityDetailMyBook : AppCompatActivity() {
     val am = AboutMember
     val fc = FunctionCollection
 
+    private lateinit var go_review_write: ActivityResultLauncher<Intent>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailMyBookBinding.inflate(layoutInflater)
@@ -42,6 +48,16 @@ class ActivityDetailMyBook : AppCompatActivity() {
         // intent에서 정보 불러오기
         idx = intent.getIntExtra("idx", 0)
         Log.i("정보태그","[ActivityDetailMyBook]idx->"+idx)
+
+        //go_review_write
+        go_review_write = registerForActivityResult<Intent, ActivityResult>(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                binding.txtReview.text = result.data?.getStringExtra("review") ?: ""
+            }
+        }
+
 
 
         // email
@@ -135,7 +151,16 @@ class ActivityDetailMyBook : AppCompatActivity() {
 
     }
 
-    fun go_to_Activity_Review_Write(view: View) {}
+    /*
+    서평쓰기 액티비티 이동
+     */
+    fun go_to_Activity_Review_Write(view: View) {
+        val intent = Intent(applicationContext, Activity_Review_Write::class.java)
+        intent.putExtra("idx", idx)
+        intent.putExtra("email", email)
+        intent.putExtra("review", binding.txtReview.text.toString())
+        go_review_write.launch(intent)
+    }
     fun more_memos(view: View) {}
     fun go_to_Activity_Add_Memo(view: View) {}
 }
