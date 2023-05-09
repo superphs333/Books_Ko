@@ -39,7 +39,6 @@ class AdapterMyBook (
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
         val binding = ItemBookListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-
         return CustomViewHolder(binding)
     }
     override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {

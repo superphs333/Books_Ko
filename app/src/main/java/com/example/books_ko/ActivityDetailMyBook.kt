@@ -161,6 +161,13 @@ class ActivityDetailMyBook : AppCompatActivity() {
         intent.putExtra("review", binding.txtReview.text.toString())
         go_review_write.launch(intent)
     }
-    fun more_memos(view: View) {}
+
+    // 메모 엑티비티로 이동
+    fun more_memos(view: View) {
+        val intent = Intent(applicationContext, Activity_Book_Memos::class.java)
+        intent.putExtra("book_idx", idx)
+        intent.putExtra("title", binding.txtTitle.text.toString())
+        startActivity(intent)
+    }
     fun go_to_Activity_Add_Memo(view: View) {}
 }
