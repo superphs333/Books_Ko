@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.books_ko.Adapter.Adapter_Img_Memo
@@ -65,13 +66,12 @@ class Activity_Add_Memo : AppCompatActivity() {
         리사이클러뷰 셋팅
          */
         // 변수 초기화
-        linearLayoutManager = LinearLayoutManager(applicationContext)
+        linearLayoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL,false)
         adapterImgMemo = Adapter_Img_Memo(arrayList!!, applicationContext, this)
         binding!!.rvMemoImgs.apply {
             setHasFixedSize(true)
             layoutManager = linearLayoutManager
             adapter = adapterImgMemo
-            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.HORIZONTAL)) // 가로나열
             // list변경될 때
             // adapterMyBook.dataMyBooks = arrayList!!
             //                adapterMyBook.notifyDataSetChanged()
@@ -104,7 +104,7 @@ class Activity_Add_Memo : AppCompatActivity() {
                     Log.i("정보태그", "이미지 여러장 선택, 갯수->{${clipData!!.itemCount}}")
                     for (i in 0 until clipData.itemCount) {
                         val imageUri = clipData.getItemAt(i).uri
-                        val outputUri = Uri.fromFile(File(applicationContext.cacheDir, "cropped_image.jpg"))
+                        val outputUri = Uri.fromFile(File(applicationContext.cacheDir, "cropped_image_${i}.jpg"))
                         var cropIntent2 = UCrop.of(imageUri, outputUri)
                             .withAspectRatio(1f, 1f) // 사각형 비율을 사용하려면 이 줄을 삭제하거나 주석 처리
                             .getIntent(applicationContext)
@@ -148,10 +148,11 @@ class Activity_Add_Memo : AppCompatActivity() {
                 Log.i("정보태그","(크롭후)resultUri->"+resultUri)
 
 
-                // 이미지 URI가 캐시 디렉토리를 참조하는 경우 외부 저장소로 복사
+                // 이미지 URI가 캐시 디렉토리를 참조하는 경우 외부 저장소로 복사 (갤러리)
                 if (resultUri != null && resultUri.toString().startsWith("file:///data/user/0/")) {
                     val timeStamp  = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-                    val imageFileName = getString(R.string.img_memo)+"_{$timeStamp}"
+                    val randomInt = (0..1000).random()
+                    val imageFileName = "cropppedImg_{$timeStamp}_{$randomInt}"
                     val inputStream = contentResolver.openInputStream(resultUri) // 이미지 파일 읽는다
                     val outputFile = File(applicationContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "${imageFileName}.jpg") // 외부 저장소에 새 이미지 파일 생성
                     val outputStream = FileOutputStream(outputFile)
@@ -164,7 +165,11 @@ class Activity_Add_Memo : AppCompatActivity() {
                     }
 
                     // 외부 저장소에 있는 새 파일의 URI로 변경
-                    resultUri = Uri.fromFile(outputFile)
+                    //resultUri = Uri.fromFile(outputFile)
+                    // 파일 내용 제공자 URI 가져오기
+                    val authority = applicationContext.packageName + ".provider"
+                    val fileProviderUri = FileProvider.getUriForFile(applicationContext, authority, outputFile)
+                    resultUri = fileProviderUri
                     image_Uri = resultUri?.toString()?.removePrefix("file://")
                     Log.i("정보태그","image_Uri->$image_Uri")
 
@@ -194,6 +199,6 @@ class Activity_Add_Memo : AppCompatActivity() {
         image_Uri = ap.cameraOnePicture(rl_camera!!, applicationContext,getString(R.string.img_memo))
     }
     fun Pick_From_Gallery(view: View) {
-        ap.gallery_one_picture(rl_gallery!!);
+        ap.pick_from_gallery_imgs(rl_gallery!!);
     }
 }

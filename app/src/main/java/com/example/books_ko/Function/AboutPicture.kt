@@ -60,7 +60,7 @@ object AboutPicture {
     fun createImageFile(context: Context,sort: String): File {
         // 1. String prefix 부분
         val timeStamp  = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageFileName = "{$sort}_{$timeStamp}_"
+        val imageFileName = "createImageFile_{$timeStamp}_"
         // 2. directory 부분(file)
         val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         // 3. 임시 파일 생성
@@ -72,6 +72,14 @@ object AboutPicture {
         val intent = Intent()
         intent.type = "image/*"
         // 이미지를 열 수 있는 앱을 호출
+        intent.action = Intent.ACTION_GET_CONTENT
+        resultLauncher.launch(intent)
+    }
+
+    fun pick_from_gallery_imgs(resultLauncher: ActivityResultLauncher<Intent>) {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        intent.type = MediaStore.Images.Media.CONTENT_TYPE
         intent.action = Intent.ACTION_GET_CONTENT
         resultLauncher.launch(intent)
     }
