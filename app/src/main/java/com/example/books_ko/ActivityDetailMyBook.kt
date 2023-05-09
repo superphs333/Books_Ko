@@ -3,15 +3,28 @@ package com.example.books_ko
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.example.books_ko.Function.AboutMember
+import com.example.books_ko.Function.AboutMember.getEmailFromRoom
+import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.databinding.ActivityDetailMyBookBinding
+import kotlinx.coroutines.launch
 
 class ActivityDetailMyBook : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailMyBookBinding
     var idx = 0
+    var email = ""
+
+    private var isInitialized = false // spinner 초기화 여부
+
+    val am = AboutMember
+    val fc = FunctionCollection
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +40,12 @@ class ActivityDetailMyBook : AppCompatActivity() {
 
         // intent에서 정보 불러오기
         idx = intent.getIntExtra("idx", 0)
+
+        // email
+        lifecycleScope.launch {
+            email = getEmailFromRoom(applicationContext)
+            Log.i("정보태그","email->$email")
+        }
 
         /*
         값 셋팅
@@ -58,6 +77,41 @@ class ActivityDetailMyBook : AppCompatActivity() {
             3 -> binding.categoryReadStatus.setSelection(0) // 읽고싶은
             1 -> binding.categoryReadStatus.setSelection(1) // 읽는중
             2 -> binding.categoryReadStatus.setSelection(2) // 읽음
+        }
+
+        /*
+        카테고리 변경시 -> 반영
+         */
+        binding.categoryReadStatus.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
+                if (isInitialized) { // 초기화 이후에만 동작하도록 함
+                    val status: Int = when (binding.categoryReadStatus.selectedItem.toString()) {
+                        getString(R.string.read_bucket) -> 3
+                        getString(R.string.read_reading) -> 1
+                        else -> 2
+                    }
+
+                    /*
+                    데이터베이스 반영
+                     */
+                    // 보낼값
+                    val map: MutableMap<String, String> = HashMap()
+                    map["sort"] = "status" // 변경할 값
+                    map["book_idx"] = idx.toString() // 책 idx
+                    map["input"] = status.toString() // 변경할 값
+                    map["email"] = email
+                    lifecycleScope.launch {
+                        val goServer = fc.goServer(applicationContext, "edit_my_book", map)
+                        if(goServer){
+                            Toast.makeText(applicationContext, "읽음 상태가 변경되었습니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    isInitialized = true // 초기화 완료
+                }
+            }
+
+            override fun onNothingSelected(adapterView: AdapterView<*>?) {}
         }
 
     }
