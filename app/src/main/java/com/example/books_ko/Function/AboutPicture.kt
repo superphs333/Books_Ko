@@ -2,6 +2,7 @@ package com.example.books_ko.Function
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
@@ -9,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.FileProvider
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,7 +34,8 @@ object AboutPicture {
             }
             // 2. FileProvider를 통해서 파일의 uri값을 만든다(이런식으로 했을 때 onActivity도달 가능)
             if(photo_File!=null){
-                val photoUri = FileProvider.getUriForFile(context,context.packageName,photo_File)
+                val authority = context.packageName + ".provider"
+                val photoUri = FileProvider.getUriForFile(context,authority,photo_File)
                 intent.putExtra(MediaStore.EXTRA_OUTPUT,photoUri)
                 resultLauncher.launch(intent)
                 return photo_File.absolutePath;
@@ -83,5 +86,33 @@ object AboutPicture {
         intent.action = Intent.ACTION_GET_CONTENT
         resultLauncher.launch(intent)
     }
+
+
+
+    // 절대경로 찾기
+    fun getFileFromContentUri(uri: Uri, context: Context, fileName: String): File? {
+        try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val file = File(context.cacheDir, fileName)
+            FileOutputStream(file).use { outputStream ->
+                val buffer = ByteArray(4 * 1024) // buffer size
+                var read: Int
+                while (inputStream?.read(buffer).also { read = it!! } != -1) {
+                    outputStream.write(buffer, 0, read)
+                }
+                outputStream.flush()
+            }
+            return file
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    fun isAbsolutePath(path: String): Boolean {
+        return path.startsWith("/")
+    }
+
+
 
 }

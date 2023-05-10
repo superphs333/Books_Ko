@@ -9,18 +9,33 @@ import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.books_ko.Adapter.Adapter_Img_Memo
+import com.example.books_ko.Data.ApiData
 import com.example.books_ko.Data.Data_Img_Memo
+import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.Function.AboutPicture
+import com.example.books_ko.Interface.JsonPlaceHolderApi
 import com.example.books_ko.databinding.ActivityAddMemoBinding
 import com.yalantis.ucrop.UCrop
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -32,6 +47,8 @@ class Activity_Add_Memo : AppCompatActivity() {
     private lateinit var binding: ActivityAddMemoBinding
 
     val ap = AboutPicture
+    val am = AboutMember
+
     var image_Uri: String? = null
     var image_bitmap: Bitmap? = null
     private var rl_camera // 카메라
@@ -43,13 +60,14 @@ class Activity_Add_Memo : AppCompatActivity() {
 
     var book_idx = 0 // 책 idx
     var memo_idx = 0 // 메모 idx
+    var email = ""
 
     // 리사이클러뷰
     var arrayList: ArrayList<Data_Img_Memo> = ArrayList()
     private lateinit var adapterImgMemo : Adapter_Img_Memo
     private lateinit var linearLayoutManager: LinearLayoutManager
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override  fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddMemoBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -61,6 +79,12 @@ class Activity_Add_Memo : AppCompatActivity() {
         val data = resources.getStringArray(R.array.select_memo_view)
         val adapterSpinner = ArrayAdapter(applicationContext, android.R.layout.simple_dropdown_item_1line, data)
         binding.spinnerSelectOpen.adapter = adapterSpinner
+
+        // 이메일 값
+        lifecycleScope.launch {
+            email = AboutMember.getEmailFromRoom(applicationContext)
+            Log.i("정보태그","email->$email")
+        }
 
         /*
         리사이클러뷰 셋팅
@@ -148,11 +172,11 @@ class Activity_Add_Memo : AppCompatActivity() {
                 Log.i("정보태그","(크롭후)resultUri->"+resultUri)
 
 
+                val timeStamp  = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+                val randomInt = (0..1000).random()
+                val imageFileName = "cropppedImg_{$timeStamp}_{$randomInt}"
                 // 이미지 URI가 캐시 디렉토리를 참조하는 경우 외부 저장소로 복사 (갤러리)
                 if (resultUri != null && resultUri.toString().startsWith("file:///data/user/0/")) {
-                    val timeStamp  = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-                    val randomInt = (0..1000).random()
-                    val imageFileName = "cropppedImg_{$timeStamp}_{$randomInt}"
                     val inputStream = contentResolver.openInputStream(resultUri) // 이미지 파일 읽는다
                     val outputFile = File(applicationContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "${imageFileName}.jpg") // 외부 저장소에 새 이미지 파일 생성
                     val outputStream = FileOutputStream(outputFile)
@@ -192,7 +216,91 @@ class Activity_Add_Memo : AppCompatActivity() {
 
     }
 
-    fun send_to_SERVER(view: View) {}
+    // 메모 내용 서버로 전송
+    fun send_to_SERVER(view: View) {
+        /*
+        데이터 전송
+         */
+        // Retrofit 인터페이스 생성
+        val retrofit = Retrofit.Builder()
+            .baseUrl(applicationContext.getString(R.string.server_url))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val myApi = retrofit.create(JsonPlaceHolderApi::class.java)
+
+        // 전송할 값
+        val forSendEmail =email.toRequestBody("text/plain".toMediaTypeOrNull())
+        // accept_sort값 분기
+        var tempAcceptSort = "Save_Memo"
+        if(memo_idx!=0){
+            tempAcceptSort = "Edit_Memo"
+        }
+        val accept_sort = tempAcceptSort.toRequestBody("text/plain".toMediaTypeOrNull())
+        val forSendMemoIdx =memo_idx.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val forSendBookIdx =book_idx.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val forSendImgSize =arrayList.size.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val forSendMemo = binding.editMemo.text.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val forSendPage = binding.editPage.text.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val open = when (binding.spinnerSelectOpen.selectedItem.toString()) {
+            "전체" -> "all"
+            "팔로잉" -> "follow"
+            else -> "no"
+        }
+        val forSendOpen = open.toRequestBody("text/plain".toMediaTypeOrNull())
+        var images = mutableListOf<MultipartBody.Part>() // 이미지들을 담을 변수
+        Log.d("정보태그","imgDataList->"+arrayList)
+        for((index, imgData) in arrayList.withIndex()){
+            // 파일이름
+            val imgFileName = "Img_Book_Memo-${(1..1000000).random()}.jpg"
+            var imageFile: File? = null
+            if (ap.isAbsolutePath(imgData.img)) {
+                imageFile = File(imgData.img!!)
+            } else {
+                val imgFileName = "Img_Book_Memo-${(1..1000000).random()}.jpg"
+                imageFile = ap.getFileFromContentUri(Uri.parse(imgData.img), applicationContext, imgFileName)
+            }
+            val imageRequestBody  = imageFile!!.asRequestBody("image/jpeg".toMediaTypeOrNull())
+
+            // 전송이름
+            val fileName = "uploaded_file$index"
+            val imagePart = MultipartBody.Part.createFormData(fileName, imgFileName, imageRequestBody)
+            images.add(imagePart)
+        }
+
+        myApi.sendDatatoMemo(forSendBookIdx,accept_sort,forSendImgSize,forSendMemo,forSendPage,forSendOpen,forSendEmail,forSendMemoIdx,images).enqueue(object :
+            Callback<ApiResponse<ApiData>> {
+            override fun onResponse(call: Call<ApiResponse<ApiData>>, response: Response<ApiResponse<ApiData>>) {
+                var toString: String = response.raw().toString()
+                Log.i("정보태그","정보->${toString}")
+                // 요청 성공 처리
+                val result = response.body()
+
+                if (result?.status == "success") {
+                    if(memo_idx==0){ // 추가
+                        Toast.makeText(
+                            applicationContext, getString(R.string.add_memo), Toast.LENGTH_LONG
+                        ).show()
+                    }else{ // 수정
+                        Toast.makeText(
+                            applicationContext, getString(R.string.edit_memo), Toast.LENGTH_LONG
+                        ).show()
+                    }
+                } else {
+                    Toast.makeText(
+                        applicationContext,
+                        getString(R.string.toast_error),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                finish()
+            }
+
+            override fun onFailure(call: Call<ApiResponse<ApiData>>, t: Throwable) {
+                // 요청 실패 처리
+                Log.i("정보태그",t.message.toString())
+            }
+        })
+    }
 
     // 카메라에서 이미지 선택
     fun Pick_From_Camera(view: View) {

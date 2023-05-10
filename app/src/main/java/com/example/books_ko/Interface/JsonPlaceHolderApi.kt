@@ -48,4 +48,19 @@ interface JsonPlaceHolderApi {
         @Field("search") search : String
     ): retrofit2.Call<ApiResponse<ApiData>>
 
+    // 메모저장
+    @Multipart //멀티파트 요청을 사용하여 데이터를 전송(멀티파트 요청 = 여러 부분으로 구성된 메세지, 텍스트 및 바이너리 데이터를 함께 전송 할 수 있음)
+    @POST("About_Memo.php")
+    fun sendDatatoMemo(
+        @Part("book_idx") book_idx: RequestBody,
+        @Part("accept_sort") accept_sort: RequestBody,
+        @Part("size") size: RequestBody,
+        @Part("memo") memo: RequestBody,
+        @Part("page") page: RequestBody,
+        @Part("open") open: RequestBody,
+        @Part("email") email: RequestBody,
+        @Part("memo_idx") memo_idx: RequestBody,
+        @Part images: List<MultipartBody.Part>
+    ): retrofit2.Call<ApiResponse<ApiData>>
+
 }

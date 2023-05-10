@@ -304,6 +304,7 @@ class Activity_Book_Add : AppCompatActivity() {
         val profileImagePart = if (image_Uri == null) {
             MultipartBody.Part.createFormData("", "", "".toRequestBody())
         } else {
+            Log.i("정보태그","(서버전송)image_Uri->$image_Uri")
             val filePath = File(image_Uri) // 이미지 파일의 경로를 가져옵니다.
             val profileImageFile = File(filePath.absolutePath) // 이미지 파일 객체를 생성합니다.
             val profileImage = profileImageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
