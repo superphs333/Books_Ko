@@ -48,12 +48,25 @@ class Adapter_Img_Memo(
          */
         Log.i("정보태그","(onBindViewHolder)img->"+item.img)
 
+        // 이미지 셋팅
         if (item.img.contains(context.getString(R.string.img_memo))) {
             Glide.with(holder.itemView.context)
                 .load(item.img)
                 .into(binding.imgMemo)
         } else {
             binding.imgMemo.setImageURI(Uri.parse(item.img))
+        }
+
+        // 이미지 삭제
+        binding.imgDelete.setOnClickListener {
+            Log.i("정보태그","position->$position")
+            dataList.remove(item)
+            notifyItemRemoved(position)
+            Log.i("정보태그", "size=>"+dataList.size);
+            // 아이템 삭제 후, 삭제한 위치 이후의 아이템 위치를 재설정
+            if (position < dataList.size) {
+                notifyItemRangeChanged(position, dataList.size - position)
+            }
         }
     }
 
