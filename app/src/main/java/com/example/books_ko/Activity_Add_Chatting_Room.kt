@@ -1,5 +1,6 @@
 package com.example.books_ko
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,8 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.databinding.ActivityAddChattingRoomBinding
-import com.google.gson.JsonElement
-import com.google.gson.JsonParser
 import kotlinx.coroutines.launch
 
 class Activity_Add_Chatting_Room : AppCompatActivity() {
@@ -69,6 +68,13 @@ class Activity_Add_Chatting_Room : AppCompatActivity() {
                         }
 
 
+                        /*
+                        액티비티 이동
+                         */
+                        val intent = Intent(applicationContext, Activity_Chatting_Room::class.java)
+                        intent.putExtra("room_idx", room_idx)
+                        startActivity(intent)
+                        finish()
 
                     }else{
                         Toast.makeText(
