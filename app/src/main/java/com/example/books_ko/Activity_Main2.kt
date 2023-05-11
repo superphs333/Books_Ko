@@ -20,6 +20,7 @@ class Activity_Main2 : AppCompatActivity() {
     // 프래그먼트
     var fragment_books: Fragment_Books? = null
     var fragment_mypage: Fragment_mypage? = null
+    var fragment_chatting_room: FragmentChattingRoom? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +33,7 @@ class Activity_Main2 : AppCompatActivity() {
         // 추가 시켜 줄 프래그먼트 객체 생성
         fragment_books = Fragment_Books()
         fragment_mypage = Fragment_mypage()
+        fragment_chatting_room = FragmentChattingRoom()
         // 프래그먼트 트랜잭션 시작 : 프래그먼트 트랜잭션, 백스택, 애니메이션 등을 설정함
         fragmentTransaction = fragmentManager!!.beginTransaction()
         fragmentTransaction!!.replace(R.id.frameLayout, fragment_books!!).commitAllowingStateLoss()
@@ -50,10 +52,10 @@ class Activity_Main2 : AppCompatActivity() {
             R.id.btn_mypage -> fragmentTransaction!!.replace(R.id.frameLayout, fragment_mypage!!)
                 .commitAllowingStateLoss()
 
-//            R.id.btn_gathering -> fragmentTransaction!!.replace(
-//                R.id.frameLayout,
-//                fragment_chatting_room
-//            ).commitAllowingStateLoss()
+            R.id.btn_gathering -> fragmentTransaction!!.replace(
+                R.id.frameLayout,
+                fragment_chatting_room!!
+            ).commitAllowingStateLoss()
 //
 //            R.id.btn_feed -> fragmentTransaction!!.replace(R.id.frameLayout, fragment_sns)
 //                .commitAllowingStateLoss()
