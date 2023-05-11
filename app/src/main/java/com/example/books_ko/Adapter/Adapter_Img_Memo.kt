@@ -96,7 +96,13 @@ class Adapter_Img_Memo(
 
     // 화면에서 없어지는 동작
     override fun onItemSwipe(position: Int) {
+        Log.i("정보태그","position->$position")
         dataList.removeAt(position)
-        notifyDataSetChanged()
+        notifyItemRemoved(position)
+        Log.i("정보태그", "size=>"+dataList.size);
+        // 아이템 삭제 후, 삭제한 위치 이후의 아이템 위치를 재설정
+        if (position < dataList.size) {
+            notifyItemRangeChanged(position, dataList.size - position)
+        }
     }
 }
