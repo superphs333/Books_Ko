@@ -66,8 +66,8 @@ class FragmentChattingRoom : Fragment() {
         binding = FragmentChattingRoomBinding.inflate(layoutInflater, container, false)
         val view: View = binding!!.getRoot()
 
-        context = view.context
-        activity = getActivity()!!
+        activity = requireActivity()
+        context = requireContext()
 
         /*
         spinner셋팅
