@@ -2,6 +2,7 @@ package com.example.books_ko
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -75,6 +76,15 @@ class FragmentChattingRoom : Fragment() {
         val data = context.resources.getStringArray(R.array.select_chatting_room_view)
         var adapter = ArrayAdapter(context,android.R.layout.simple_dropdown_item_1line,data)
         binding!!.spinSort.adapter = adapter
+
+
+        /*
+        btn_add_room => 채팅방 개설 액티비티 이동
+         */
+        binding!!.btnAddRoom.setOnClickListener {
+            val intent = Intent(context, Activity_Add_Chatting_Room::class.java)
+            startActivity(intent)
+        }
 
 
         return binding?.root

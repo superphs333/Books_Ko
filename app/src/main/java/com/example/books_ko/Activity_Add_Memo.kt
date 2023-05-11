@@ -45,7 +45,7 @@ import java.util.*
 
 class Activity_Add_Memo : AppCompatActivity() {
 
-    // 이건 oncreate 밖에
+
     private lateinit var binding: ActivityAddMemoBinding
 
     val ap = AboutPicture

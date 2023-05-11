@@ -9,6 +9,7 @@ import com.android.volley.toolbox.Volley
 import com.example.books_ko.Class.AppHelper
 import com.example.books_ko.R
 import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -75,6 +76,89 @@ object FunctionCollection {
         request.setShouldCache(false)
         appHelper.requestQueue = Volley.newRequestQueue(context)
         appHelper.requestQueue!!.add(request)
-
     }
+
+    // 서버에서 가져온 결과값이 필요한 경우
+    suspend fun goServerForResult(context: Context, accept_sort: String, map: MutableMap<String, String>): Map<String, Any> = suspendCoroutine { continuation ->
+        // suspendCoroutine -> 코루틴을 일시정지
+        /*
+        웹페이지 주소
+         */
+        val destination = when (accept_sort) {
+            "edit_my_book", "delete_my_book" -> "About_Book.php"
+            "save_chatting_room", "delete_rom", "edit_chatting_room", "get_chatting_room_info", "out_room", "join_room", "out_join_room", "get_chatting", "alarm_for_chatting" -> "About_Chatting.php"
+            "Change_Member_Info" -> "About_Member.php"
+            "following" -> "About_Follow.php"
+            else -> ""
+        }
+
+        val url: String = context.getString(R.string.server_url) + destination
+        val request: StringRequest = object : StringRequest(
+            Method.POST,
+            url,
+            Response.Listener<String> { response ->
+                // 정상 응답
+                Log.i("정보태그", "(go_server)response=>$response")
+
+                // 결과값 파싱
+                val jsonParser = JsonParser()
+                val jsonElement: JsonElement = jsonParser.parse(response)
+
+                // 결과값
+                val resultObject: JsonObject = jsonElement.getAsJsonObject()
+                val resultMap: MutableMap<String, Any> = HashMap()
+                for ((key, value) in resultObject.entrySet()) {
+                    if (key == "data") {
+                        val dataJson = value as JsonObject
+                        val dataMap: MutableMap<String, String> = HashMap()
+                        for ((dataKey, dataValue) in dataJson.entrySet()) {
+                            dataMap[dataKey] = dataValue.asString
+                        }
+                        resultMap[key] = dataMap
+                    } else {
+                        resultMap[key] = value.asString
+                    }
+                }
+
+                /*
+                사용법
+                val status: String = resultMap["status"] as String
+                val message: String = resultMap["message"] as String
+
+                val data: Map<String, String> = resultMap["data"] as Map<String, String>
+                val acceptSort: String = data["accept_sort"] as String
+                val roomExplain: String = data["room_explain"] as String
+                // 나머지 필요한 데이터를 찾아서 사용
+                val roomIdx: Int = data["room_idx"]?.toIntOrNull() ?: 0 // Int로 변환하여 사용하거나 기본값 0 설정
+                 */
+
+                continuation.resume(resultMap)
+            },
+            Response.ErrorListener { error ->
+                // 에러 발생
+                val networkResponse = error.networkResponse
+                if (networkResponse != null && networkResponse.data != null) {
+                    val jsonError = String(networkResponse.data)
+                    Log.d("정보태그", "onErrorResponse: $jsonError")
+                }
+                continuation.resume(emptyMap())
+            }
+        ) {
+            @Throws(AuthFailureError::class)
+            override fun getParams(): Map<String, String>? {
+                val params: MutableMap<String, String> = HashMap()
+                params["accept_sort"] = accept_sort
+                for (key in map.keys) {
+                    params[key] = map[key].toString()
+                }
+                return params
+            }
+        }
+
+        request.setShouldCache(false)
+        appHelper.requestQueue = Volley.newRequestQueue(context)
+        appHelper.requestQueue!!.add(request)
+    }
+
+
 }
