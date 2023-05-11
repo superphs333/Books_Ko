@@ -17,7 +17,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.bookapp.ItemTouchHelperCallback
 import com.example.books_ko.Adapter.Adapter_Img_Memo
 import com.example.books_ko.Data.ApiData
 import com.example.books_ko.Data.Data_Img_Memo
@@ -66,6 +68,7 @@ class Activity_Add_Memo : AppCompatActivity() {
     var arrayList: ArrayList<Data_Img_Memo> = ArrayList()
     private lateinit var adapterImgMemo : Adapter_Img_Memo
     private lateinit var linearLayoutManager: LinearLayoutManager
+    private lateinit var helper : ItemTouchHelper
 
     override  fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,6 +103,8 @@ class Activity_Add_Memo : AppCompatActivity() {
             // adapterMyBook.dataMyBooks = arrayList!!
             //                adapterMyBook.notifyDataSetChanged()
         }
+        helper = ItemTouchHelper(ItemTouchHelperCallback(adapterImgMemo))
+        helper.attachToRecyclerView(binding.rvMemoImgs)  // ItemTouchHelper를 제공된 RecyclerView에 붙인다
 
         /*
         사진 관련 registerForActivityResult
