@@ -56,8 +56,9 @@ class Activity_Add_Chatting_Room : AppCompatActivity() {
 
                             // 저장한 room_idx가져오기 (해당 룸의 자세히 보기로 이동하기 위해)
                             val data: Map<String, String> = goServerForResult["data"] as Map<String, String>
-                            val room_idx: String = data["room_idx"] as String
-                            Log.i("정보태그","room_idx->$room_idx")
+                            val room_idxString = data["room_idx"] as? String
+                            room_idx = room_idxString?.toIntOrNull() ?: 0
+
 
                         }else{ // 방수정
                             Toast.makeText(

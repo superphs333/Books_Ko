@@ -29,7 +29,7 @@ class Activity_Chatting_Room : AppCompatActivity() {
 
         // 방 idx가져오기
         room_idx = intent.getIntExtra("room_idx",0)
-        Log.i("정보태그","room_idx->$room_idx")
+        Log.i("정보태그","[Activity_Chatting_Room]room_idx->$room_idx")
 
         // 리사이클러뷰 셋팅
         linearLayoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL,false)
