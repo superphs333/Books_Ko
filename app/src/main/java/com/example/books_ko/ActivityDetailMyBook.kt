@@ -170,6 +170,8 @@ class ActivityDetailMyBook : AppCompatActivity() {
 
 
 
+
+
     }
 
     override fun onResume() {
@@ -178,6 +180,7 @@ class ActivityDetailMyBook : AppCompatActivity() {
         /*
         메모 데이터 불러오기
          */
+
 
     }
 

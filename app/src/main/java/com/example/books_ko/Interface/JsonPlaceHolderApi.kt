@@ -4,6 +4,7 @@ import com.example.books_ko.ApiResponse
 import com.example.books_ko.Data.ApiData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Multipart
@@ -61,6 +62,22 @@ interface JsonPlaceHolderApi {
         @Part("email") email: RequestBody,
         @Part("memo_idx") memo_idx: RequestBody,
         @Part images: List<MultipartBody.Part>
+    ): retrofit2.Call<ApiResponse<ApiData>>
+
+    /*
+    메모리스트
+        - accept_sort => case 나누기 위해
+        - requester => 요청자(email)
+        - book_idx => 책고유값
+        - view => 상태(전체, 팔로우, 내메모)
+     */
+    @FormUrlEncoded
+    @POST("About_Memo.php")
+    open fun Get_Data_Book_Memos(
+        @Field("accept_sort") accept_sort: String?,
+        @Field("requester") requester: String?,
+        @Field("book_idx") book_idx: Int,
+        @Field("view") view: String?
     ): retrofit2.Call<ApiResponse<ApiData>>
 
 }
