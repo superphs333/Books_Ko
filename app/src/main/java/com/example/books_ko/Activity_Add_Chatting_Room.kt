@@ -33,6 +33,13 @@ class Activity_Add_Chatting_Room : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+
+
+    }
+
     fun onClick(view: View) {
         when (view.getId()) {
             // 데이터 저장

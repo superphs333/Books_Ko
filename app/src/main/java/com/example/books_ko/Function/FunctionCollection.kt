@@ -99,26 +99,62 @@ object FunctionCollection {
             Response.Listener<String> { response ->
                 // 정상 응답
                 Log.i("정보태그", "(go_server)response=>$response")
+                /*
+                ex)
+                {
+                    "status": "success",
+                    "message": "요청이 성공적으로 처리되었습니다.",
+                    "data": {
+                        "accept_sort": "get_chatting_room_info",
+                        "idx": "29",
+                        "query": "SELECT cr.title, cr.room_explain, cr.total_count, cr.idx, cr.leader, COUNT(cr.idx) as join_count FROM Chatting_Room as cr LEFT JOIN Join_Chatting_Room as jcr ON cr.idx=jcr.room_idx WHERE cr.idx=29 and jcr.status=1 GROUP BY cr.idx",
+                        "result": "success",
+                        "room_info": {
+                            "title": "333",
+                            "room_explain": "3333",
+                            "total_count": "333",
+                            "idx": "29",
+                            "leader": "leesotest@gmail.com",
+                            "join_count": "1"
+                        }
+                    }
+                }
+                 */
 
                 // 결과값 파싱
                 val jsonParser = JsonParser()
-                val jsonElement: JsonElement = jsonParser.parse(response)
+                val jsonElement: JsonElement = jsonParser.parse(response) // JSON 문자열을 파싱하여 JsonElement로 변환
 
                 // 결과값
-                val resultObject: JsonObject = jsonElement.getAsJsonObject()
-                val resultMap: MutableMap<String, Any> = HashMap()
+                val resultObject: JsonObject = jsonElement.getAsJsonObject() // Element를 JsonObject로 변환
+                val resultMap: MutableMap<String, Any> = HashMap() // 파싱 결과 저장용
+
                 for ((key, value) in resultObject.entrySet()) {
-                    if (key == "data") {
-                        val dataJson = value as JsonObject
-                        val dataMap: MutableMap<String, String> = HashMap()
+                    if (key == "data") { // key: data인 경우
+                        val dataJson = value as JsonObject // value를 JsonObject로 캐스팅
+                        val dataMap: MutableMap<String, Any> = HashMap() // data" 하위 객체의 파싱 결과를 저장하기 위한 컨테이너
+
                         for ((dataKey, dataValue) in dataJson.entrySet()) {
-                            dataMap[dataKey] = dataValue.asString
+                            val parsedValue = when {
+                                dataValue.isJsonObject() -> { // JSON 객체인 경우
+                                    val jsonObject = dataValue as JsonObject
+                                    val jsonObjectMap: MutableMap<String, String> = HashMap()
+
+                                    for ((objKey, objValue) in jsonObject.entrySet()) {
+                                        jsonObjectMap[objKey] = objValue.asString
+                                    }
+                                    jsonObjectMap
+                                }
+                                else -> dataValue.asString // 그 외의 경우에는 문자열로 처리
+                            }
+                            dataMap[dataKey] = parsedValue
                         }
                         resultMap[key] = dataMap
-                    } else {
+                    } else { // data 외의 경우에는 key-value 저장
                         resultMap[key] = value.asString
                     }
                 }
+
 
                 /*
                 사용법

@@ -1,26 +1,32 @@
 package com.example.books_ko
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.books_ko.Adapter.Adapter_Img_Memo
 import com.example.books_ko.Data.Data_Img_Memo
-import com.example.books_ko.databinding.ActivityAddChattingRoomBinding
+import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.databinding.ActivityChattingRoomBinding
-import java.util.ArrayList
-import kotlin.properties.Delegates
+import kotlinx.coroutines.launch
 
 class Activity_Chatting_Room : AppCompatActivity() {
 
     private lateinit var binding : ActivityChattingRoomBinding
     var room_idx = 0
+    var leader= ""
+    var total_count = 0
+    var join_count = 0
 
     var arrayList: ArrayList<Data_Img_Memo> = ArrayList()
     private lateinit var adapterImgMemo : Adapter_Img_Memo
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var helper : ItemTouchHelper
+
+    val fc = FunctionCollection
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,5 +48,40 @@ class Activity_Chatting_Room : AppCompatActivity() {
             // adapterMyBook.dataMyBooks = arrayList!!
             //                adapterMyBook.notifyDataSetChanged()
         }
+
+        /*
+        채팅방 데이터 셋팅
+         */
+        val map: MutableMap<String, String> = HashMap()
+        map["idx"] = room_idx.toString() // room_idx
+        lifecycleScope.launch {
+            val goServerForResult = fc.goServerForResult(applicationContext, "get_chatting_room_info", map)
+
+            if(goServerForResult["status"]=="success"){
+
+                val data: Map<String, Any> = goServerForResult["data"] as Map<String, Any>
+                val room_info : Map<String, String> = data["room_info"] as Map<String, String>
+                binding.txtTitle.setText(room_info["title"])
+                binding.txtExplain.setText(room_info["room_explain"])
+                binding.txtTotal.setText(room_info["total_count"])
+                binding.txtCount.setText(room_info["join_count"])
+                leader = room_info["leader"]!!
+                total_count = room_info["total_count"]!!.toInt()
+                join_count = room_info["join_count"]!!.toInt()
+
+
+
+            }else{
+                Toast.makeText(
+                    applicationContext,
+                    getString(R.string.toast_error),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 }
