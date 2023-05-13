@@ -91,4 +91,15 @@ interface JsonPlaceHolderApi {
         @Field("inputStatus") inputStatus : Int
     ): retrofit2.Call<ApiResponse<ApiData>>
 
+    /*
+    채팅방 참여자 리스트
+     */
+    @FormUrlEncoded
+    @POST("About_Chatting.php")
+    open fun Get_join_chatting_room_people(
+        @Field("accept_sort") accept_sort: String,
+        @Field("room_idx")   room_idx : Int ,
+        @Field("email") email : String
+    ): retrofit2.Call<ApiResponse<ApiData>>
+
 }

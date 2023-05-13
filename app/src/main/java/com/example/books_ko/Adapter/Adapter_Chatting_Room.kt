@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.books_ko.Activity_Add_Chatting_Room
+import com.example.books_ko.Activity_Chatting_Room
 import com.example.books_ko.Data.Data_Chatting_Room
 import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.databinding.ItemChattingRoomBinding
@@ -53,6 +54,14 @@ class Adapter_Chatting_Room (
         binding.txtCount.text = item.join_count.toString() // 참여인원
         binding.txtTotal.text = item.total_count.toString() // 참여 가능 인원
         binding.txtFunction.visibility = if (email == item.leader) View.VISIBLE else View.GONE // txt_function -> leader의 경우에만 view
+
+        // 클릭 -> 해당 채팅방 룸으로 들어가기
+        binding.root.setOnClickListener {
+            val intent = Intent(binding.root.context, Activity_Chatting_Room::class.java)
+            intent.putExtra("room_idx", item.idx)
+            intent.putExtra("leader", item.leader)
+            binding.root.context.startActivity(intent)
+        }
 
 
         // txt_function => 수정, 삭제

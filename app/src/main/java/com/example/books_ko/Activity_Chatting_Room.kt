@@ -7,15 +7,25 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.books_ko.Adapter.Adapter_Img_Memo
+import com.example.books_ko.Adapter.Adapter_Join_People
+import com.example.books_ko.Data.Data_Chatting_Room
 import com.example.books_ko.Data.Data_Img_Memo
+import com.example.books_ko.Data.Data_Join_People
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.Function.FunctionCollection
+import com.example.books_ko.Interface.JsonPlaceHolderApi
 import com.example.books_ko.databinding.ActivityChattingRoomBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 
 class Activity_Chatting_Room : AppCompatActivity() {
 
@@ -24,11 +34,14 @@ class Activity_Chatting_Room : AppCompatActivity() {
     var leader= ""
     var total_count = 0
     var join_count = 0
+    var email = ""
 
-    var arrayList: ArrayList<Data_Img_Memo> = ArrayList()
-    private lateinit var adapterImgMemo : Adapter_Img_Memo
+    val activity = this
+
+    var arrayList: ArrayList<Data_Join_People> = ArrayList()
+    private lateinit var adapterJoinPeople : Adapter_Join_People
     private lateinit var linearLayoutManager: LinearLayoutManager
-    private lateinit var helper : ItemTouchHelper
+
 
     val fc = FunctionCollection
     val am = AboutMember
@@ -38,21 +51,22 @@ class Activity_Chatting_Room : AppCompatActivity() {
         binding = ActivityChattingRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 방 idx가져오기
-        room_idx = intent.getIntExtra("room_idx",0)
-        Log.i("정보태그","[Activity_Chatting_Room]room_idx->$room_idx")
-
         // 리사이클러뷰 셋팅
-        linearLayoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL,false)
-        adapterImgMemo = Adapter_Img_Memo(arrayList!!, applicationContext, this)
-        binding!!.rvPeoples.apply {
-            setHasFixedSize(true)
-            layoutManager = linearLayoutManager
-            adapter = adapterImgMemo
-            // list변경될 때
-            // adapterMyBook.dataMyBooks = arrayList!!
-            //                adapterMyBook.notifyDataSetChanged()
+        lifecycleScope.launch {
+            room_idx = intent.getIntExtra("room_idx",0)             // 방 idx가져오기
+            Log.i("정보태그","[Activity_Chatting_Room]room_idx->$room_idx")
+            leader = intent.getStringExtra("leader")!!             // leader
+            Log.i("정보태그","[Activity_Chatting_Room]leader->$leader")
+            email =am.getEmailFromRoom(applicationContext)
+            linearLayoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL,false)
+            adapterJoinPeople = Adapter_Join_People(arrayList!!, applicationContext, activity, email,leader)
+            binding!!.rvPeoples.apply {
+                setHasFixedSize(true)
+                layoutManager = linearLayoutManager
+                adapter = adapterJoinPeople
+            }
         }
+
 
         /*
         채팅방 데이터 셋팅
@@ -60,6 +74,7 @@ class Activity_Chatting_Room : AppCompatActivity() {
         val map: MutableMap<String, String> = HashMap()
         map["idx"] = room_idx.toString() // room_idx
         lifecycleScope.launch {
+
             val goServerForResult = fc.goServerForResult(applicationContext, "get_chatting_room_info", map)
 
             if(goServerForResult["status"]=="success"){
@@ -88,6 +103,17 @@ class Activity_Chatting_Room : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        lifecycleScope.launch {
+            email =am.getEmailFromRoom(applicationContext)
+            arrayList = getJoinPeoples()!!
+            adapterJoinPeople.dataList = arrayList!!
+            adapterJoinPeople.notifyDataSetChanged()
+        }
+
+
+
+
     }
 
     fun onClick(view: View) {
@@ -116,6 +142,39 @@ class Activity_Chatting_Room : AppCompatActivity() {
 //                intent.putExtra("title", binding.txtTitle.text.toString())
 //                startActivity(intent)
             }
+        }
+    }
+
+    // 채팅방 참여자 불러오기
+    suspend fun getJoinPeoples(): ArrayList<Data_Join_People>? = withContext(Dispatchers.IO) {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(getString(R.string.server_url))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val myApi = retrofit.create(JsonPlaceHolderApi::class.java)
+
+
+        try {
+            val response = myApi.Get_join_chatting_room_people("Get_join_chatting_room_people", room_idx,email).execute()
+            if (response.isSuccessful) {
+                val result = response.body()
+                if (result?.status == "success"){
+                    val dataJoinPeopleList =
+                        response.body()?.data?.dataJoinPeopleList as ArrayList<Data_Join_People>?
+                    Log.i("정보태그","[채팅방 참여 리스트]=>"+dataJoinPeopleList)
+                    dataJoinPeopleList
+
+
+                } else {
+                    Log.i("정보태그", "[getChattingRooms]서버에 연결은 되었으나 오류발생")
+                    null
+                }
+            } else {
+                Log.i("정보태그", "[getChattingRooms]result.staus isSuccessful X")
+                null
+            }
+        } catch (e: IOException) {
+            null
         }
     }
 

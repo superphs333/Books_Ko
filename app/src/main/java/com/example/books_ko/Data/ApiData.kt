@@ -12,5 +12,6 @@ data class ApiData (
     val sql: String? = null,
     val bookList:ArrayList<DataMyBook>,
     val chattingRoomList:ArrayList<Data_Chatting_Room>,
+    val dataJoinPeopleList:ArrayList<Data_Join_People>,
         )
 
