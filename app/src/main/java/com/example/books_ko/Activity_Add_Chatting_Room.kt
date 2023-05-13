@@ -31,6 +31,21 @@ class Activity_Add_Chatting_Room : AppCompatActivity() {
             email = AboutMember.getEmailFromRoom(applicationContext)
             Log.i("정보태그","email->$email")
         }
+
+        room_idx = intent.getIntExtra("idx", 0)
+        Log.i("정보태그", "room_idx=>$room_idx")
+
+        // 수정인 경우 데이터 셋팅
+        if (room_idx != 0) {
+            binding.txtTitle.text = "채팅방 수정"
+            binding.btnAdd.text = "수정"
+            binding.editTitle.setText(intent.getStringExtra("title"))
+            binding.editExplain.setText(intent.getStringExtra("room_explain"))
+            binding.editCount.setText(intent.getIntExtra("total_count", 0).toString() + "")
+        }
+
+        // [개선] 참여 가능 인원이 현재 참여 인원보다 적으면 알림창 or 참여 가능 인원 수정 금지 ?
+
     }
 
     override fun onResume() {
@@ -49,11 +64,12 @@ class Activity_Add_Chatting_Room : AppCompatActivity() {
                 map["room_explain"] = binding.editExplain.text.toString()// 방설명
                 map["title"] = binding.editTitle.text.toString() // 제목
                 map["email"] = email
+                map["idx"] = room_idx.toString()
+                val accept_sort = if (room_idx == 0) "save_chatting_room" else "edit_chatting_room"
                 lifecycleScope.launch {
-                    val goServerForResult = fc.goServerForResult(applicationContext, "save_chatting_room", map)
+                    val goServerForResult = fc.goServerForResult(applicationContext, accept_sort, map)
 
                     if(goServerForResult["status"]=="success"){
-                        Toast.makeText(applicationContext, R.string.save_chatting_room, Toast.LENGTH_SHORT).show()
                         if(room_idx==0){ // 방추가
                             Toast.makeText(
                                 applicationContext,
@@ -65,8 +81,6 @@ class Activity_Add_Chatting_Room : AppCompatActivity() {
                             val data: Map<String, String> = goServerForResult["data"] as Map<String, String>
                             val room_idxString = data["room_idx"] as? String
                             room_idx = room_idxString?.toIntOrNull() ?: 0
-
-
                         }else{ // 방수정
                             Toast.makeText(
                                 applicationContext,
