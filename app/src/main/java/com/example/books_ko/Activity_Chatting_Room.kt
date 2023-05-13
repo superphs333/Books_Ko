@@ -1,7 +1,10 @@
 package com.example.books_ko
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -9,6 +12,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.books_ko.Adapter.Adapter_Img_Memo
 import com.example.books_ko.Data.Data_Img_Memo
+import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.databinding.ActivityChattingRoomBinding
 import kotlinx.coroutines.launch
@@ -27,6 +31,7 @@ class Activity_Chatting_Room : AppCompatActivity() {
     private lateinit var helper : ItemTouchHelper
 
     val fc = FunctionCollection
+    val am = AboutMember
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,4 +89,34 @@ class Activity_Chatting_Room : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
     }
+
+    fun onClick(view: View) {
+        when (view.id) {
+            R.id.btn_join -> {
+//                val map: MutableMap<String, String> = HashMap()
+//                map["room_idx"] = room_idx.toString() // 방
+//                map["state"] = state.toString() // 상태(참여중인지 아닌지)
+//                lifecycleScope.launch {
+//                    map["email"] = am.getEmailFromRoom(applicationContext) // 참여자
+//                    val goServer = fc.goServer(applicationContext, "out_join_room",map as MutableMap<String, String>)
+//                    if(goServer){
+//                        Toast.makeText(applicationContext, "리뷰가 변경되었습니다.", Toast.LENGTH_SHORT).show()
+//
+//                        // Intent
+//                        val intent = Intent(applicationContext, ActivityDetailMyBook::class.java)
+//                        intent.putExtra("review", binding.editReview.text.toString())
+//                        setResult(Activity.RESULT_OK, intent)
+//                        finish()
+//                    }
+//                }
+            }
+            R.id.btn_enter -> {
+//                val  intenttemp = intent(applicationContext, Activity_Chatting::class.java)
+//                intent.putExtra("room_idx", room_idx)
+//                intent.putExtra("title", binding.txtTitle.text.toString())
+//                startActivity(intent)
+            }
+        }
+    }
+
 }
