@@ -80,4 +80,15 @@ interface JsonPlaceHolderApi {
         @Field("view") view: String?
     ): retrofit2.Call<ApiResponse<ApiData>>
 
+    /*
+    채팅방 리스트
+     */
+    @FormUrlEncoded
+    @POST("About_Chatting.php")
+    open fun Get_Chatting_Room_Data(
+        @Field("accept_sort") accept_sort: String?,
+        @Field("email")   email : String ,
+        @Field("inputStatus") inputStatus : Int
+    ): retrofit2.Call<ApiResponse<ApiData>>
+
 }

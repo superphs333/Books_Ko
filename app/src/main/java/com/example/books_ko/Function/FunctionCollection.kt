@@ -45,7 +45,7 @@ object FunctionCollection {
                 val jsonElement: JsonElement = jsonParser.parse(response)
 
                 // 결과값
-                val result: String = jsonElement.getAsJsonObject().get("result").getAsString()
+                val result: String = jsonElement.getAsJsonObject().get("status").getAsString()
                 Log.i("정보태그","[goServer]result=>"+result);
 
                 val isSuccess = (result == "success")
