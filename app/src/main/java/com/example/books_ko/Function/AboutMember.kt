@@ -483,7 +483,7 @@ object AboutMember{
            Response.Listener<String> { response ->
 
                // 정상 응답
-               Log.i("정보태그", "(google_sign_up)response=>$response")
+               Log.i("정보태그", "(Change_Member_Info)response=>$response")
 
                // 결과값 파싱
                val jsonParser = JsonParser()
@@ -491,7 +491,7 @@ object AboutMember{
 
                // 결과값
                val result: String = jsonElement.getAsJsonObject().get("result").getAsString()
-               Log.i("정보태그","result=>"+result);
+               Log.i("정보태그","(result=>"+result);
 
                if(result == "success"){
                    database = Room.databaseBuilder(context, UserDatabase::class.java, "app_database").build()
@@ -508,8 +508,10 @@ object AboutMember{
                     // LiveData를 사용하여 데이터 변경 시 UI 업데이트
                    userLiveData.observe(activity, Observer { userData ->
                         if(userData != null){  // 나머지 => 해당 액티비티만 finish
-                            activity.lifecycleScope.launch {
-                                (activity as Activity).finish()
+                            if(sort != "sender_id"){
+                                activity.lifecycleScope.launch {
+                                    (activity as Activity).finish()
+                                }
                             }
                         }else{ // 비밀번호 찾기->비밀번호 변경으로 온 경우 => 메인페이지 이동
                             context?.let {

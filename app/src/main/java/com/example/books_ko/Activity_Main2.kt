@@ -6,8 +6,13 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.lifecycleScope
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.databinding.ActivityMain2Binding
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class Activity_Main2 : AppCompatActivity() {
 
@@ -27,6 +32,29 @@ class Activity_Main2 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMain2Binding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        /*
+        FCM - 현재 등록 토큰 가져오기
+         */
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener(OnCompleteListener<String> { task ->
+                if (!task.isSuccessful) {
+                    Log.w("정보태그", "Fetching FCM registration token failed", task.exception)
+                    return@OnCompleteListener
+                }
+
+                // Get new FCM registration token
+                val token = task.result
+                Log.i("정보태그", "token=>$token")
+
+                // email
+                GlobalScope.launch {
+                    email = AboutMember.getEmailFromRoom(applicationContext)
+                    Log.i("정보태그","(AboutMember.getEmailFromRoom로 가져온)email->$email")
+                    am.Change_Member_Info(applicationContext,this@Activity_Main2,"sender_id", token, email)
+                }
+
+            })
 
         // 프래그먼트 매니저 선언 : 프래그먼트 트랜잭션 수행(프래그먼트 추가/삭제/교체)을 하기 위해 필요
         fragmentManager = supportFragmentManager

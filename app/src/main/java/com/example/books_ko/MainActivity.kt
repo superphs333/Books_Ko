@@ -20,9 +20,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,6 +50,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         Log.i("정보태그","MainActivity onCreate")
+
+        val apiLevel = android.os.Build.VERSION.SDK_INT
+        Log.d("정보태그", "API Level: $apiLevel")
+
 
 
         // 자동로그인 / user데이터베이스에 있는 모든 정보 삭제
@@ -135,6 +141,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+
 
 
     }
