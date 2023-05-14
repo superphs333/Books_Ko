@@ -31,7 +31,7 @@ class Activity_Chatting_Room : AppCompatActivity() {
 
     private lateinit var binding : ActivityChattingRoomBinding
     var room_idx = 0
-    var leader= ""
+    var leader : String?= ""
     var total_count = 0
     var join_count = 0
     var email = ""
@@ -55,11 +55,16 @@ class Activity_Chatting_Room : AppCompatActivity() {
         lifecycleScope.launch {
             room_idx = intent.getIntExtra("room_idx",0)             // 방 idx가져오기
             Log.i("정보태그","[Activity_Chatting_Room]room_idx->$room_idx")
-            leader = intent.getStringExtra("leader")!!             // leader
+            // leader정보 intent에 없는 경우는 -> 추가에서 온 경우 : 사용자의 email넣어줌
+
+            leader= intent.getStringExtra("leader")
+            if (leader == null) {
+                leader = email
+            }
             Log.i("정보태그","[Activity_Chatting_Room]leader->$leader")
             email =am.getEmailFromRoom(applicationContext)
             linearLayoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL,false)
-            adapterJoinPeople = Adapter_Join_People(arrayList!!, applicationContext, activity, email,leader)
+            adapterJoinPeople = Adapter_Join_People(arrayList!!, applicationContext, activity, email,leader!!)
             binding!!.rvPeoples.apply {
                 setHasFixedSize(true)
                 layoutManager = linearLayoutManager

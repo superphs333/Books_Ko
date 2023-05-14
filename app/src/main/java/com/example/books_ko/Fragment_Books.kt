@@ -58,7 +58,6 @@ class Fragment_Books : Fragment(), View.OnClickListener {
     override fun onResume() {
         super.onResume()
 
-
         CoroutineScope(Dispatchers.Main).launch {
             email = am.getEmailFromRoom(context)
             Log.i("정보태그","email->"+email)

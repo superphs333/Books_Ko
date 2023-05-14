@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.books_ko.Adapter.AdapterMyBook
 import com.example.books_ko.Adapter.Adapter_Chatting_Room
@@ -48,7 +49,7 @@ class FragmentChattingRoom : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             email = am.getEmailFromRoom(context)
             Log.i("정보태그","email->"+email)
 
