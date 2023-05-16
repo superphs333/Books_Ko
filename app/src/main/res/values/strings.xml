@@ -79,6 +79,10 @@
     <string name="add_memo">메모가 등록되었습니다</string>
     <string name="edit_memo">메모가 수정되었습니다</string>
 
+    <string name="memoSortWhole">1</string>
+    <string name="memoSortFollow">2</string>
+    <string name="memoSortMy">3</string>
+
     <!--
     채팅방 관련
     -->
@@ -87,8 +91,8 @@
     <string name="delete_chatting_room">채팅방이 삭제되었습니다.</string>
 
     <!--
-일반
--->
+    일반
+    -->
     <string name="delete">삭제</string>
     <string name="update">수정</string>
 </resources>

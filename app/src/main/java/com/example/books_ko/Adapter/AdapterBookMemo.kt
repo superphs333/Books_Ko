@@ -58,7 +58,7 @@ class AdapterBookMemo (
         /*
         데이터 셋팅
          */
-        // 프로필 이미지 셋팅
+        // 프로필 이미지 셋팅 [개선] 필요
         Glide.with(holder.itemView.context)
             .load(dataList.get(position).profileUrl)
             .into(binding.imgProfile)
@@ -85,7 +85,7 @@ class AdapterBookMemo (
             .split(", ") // 구분자인 ", "로 분할
             .map { it.removeSurrounding("\"") } // 각 아이템의 시작과 끝의 따옴표 제거
             .toTypedArray()
-        imgUrlList.forEach {  Log.i("정보태그","imgUrl->${it}") }
+//        imgUrlList.forEach { // Log.i("정보태그","imgUrl->${it}") }
         /*
         이미지 슬라이더
          */

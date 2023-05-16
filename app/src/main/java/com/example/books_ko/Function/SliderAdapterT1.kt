@@ -56,7 +56,7 @@ class SliderAdapterT1(private val context: Context) :
         viewHolder.itemView.setOnClickListener {
             Toast.makeText(context, "This is item in position $position", Toast.LENGTH_SHORT)
                 .show()
-            Log.i("정보태그","imgUrl->${sliderItem.imageUrl}")
+            //Log.i("정보태그","imgUrl->${sliderItem.imageUrl}")
         }
     }
 
