@@ -37,11 +37,11 @@ object AboutMemo {
     private lateinit var database: UserDatabase
 
 
-    suspend fun getMemo(
+    suspend fun  getMemo(
         context: Context,
         email: String,
         book_idx: Int,
-        view: String
+        view: Int
     ): ArrayList<Data_Book_Memo>? = withContext(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
             .baseUrl(context.getString(R.string.server_url))
@@ -50,12 +50,16 @@ object AboutMemo {
         val myApi = retrofit.create(JsonPlaceHolderApi::class.java)
         val accept_sort = "Get_Data_Book_Memos"
 
+        // 보내는 값 확인
+        Log.d("정보태그", "context: $context, email: $email, book_idx: $book_idx, view: $view")
+
+
         try {
             val response = myApi.Get_Data_Book_Memos(accept_sort, email,book_idx,view).execute()
             if (response.isSuccessful) {
                 val result = response.body()
                 if (result?.status == "success"){
-                    response.body()?.data?.bookList as ArrayList<Data_Book_Memo>?
+                    response.body()?.data?.memoList as ArrayList<Data_Book_Memo>?
                 } else {
                     Log.i("정보태그", "[getMemo]서버에 연결은 되었으나 오류발생")
                     null

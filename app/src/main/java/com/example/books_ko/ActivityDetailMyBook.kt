@@ -14,10 +14,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.example.books_ko.Adapter.AdapterBookMemo
 import com.example.books_ko.Adapter.Adapter_Img_Memo
+import com.example.books_ko.Data.Data_Book_Memo
 import com.example.books_ko.Data.Data_Img_Memo
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.Function.AboutMember.getEmailFromRoom
+import com.example.books_ko.Function.AboutMemo
 import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.databinding.ActivityDetailMyBookBinding
 import kotlinx.coroutines.launch
@@ -33,13 +36,14 @@ class ActivityDetailMyBook : AppCompatActivity() {
     private var isInitializedStar = false // 별점 초기화 여부
 
     val am = AboutMember
+    val amemo = AboutMemo
     val fc = FunctionCollection
 
     private lateinit var go_review_write: ActivityResultLauncher<Intent>
 
     // 리사이클러뷰
-    var arrayList: ArrayList<Data_Img_Memo> = ArrayList()
-    private lateinit var adapterImgMemo : Adapter_Img_Memo
+    var arrayList: ArrayList<Data_Book_Memo> = ArrayList()
+    private lateinit var mainAdapter : AdapterBookMemo
     private lateinit var linearLayoutManager: LinearLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,11 +71,6 @@ class ActivityDetailMyBook : AppCompatActivity() {
             }
         }
 
-        // email
-        lifecycleScope.launch {
-            email = getEmailFromRoom(applicationContext)
-            Log.i("정보태그","email->$email")
-        }
 
         /*
         값 셋팅
@@ -108,16 +107,13 @@ class ActivityDetailMyBook : AppCompatActivity() {
         /*
         리사이클러뷰 변수
          */
-//        linearLayoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL,false)
-//        adapterImgMemo = Adapter_Img_Memo(arrayList!!, applicationContext, this)
-//        binding!!.rvBookMemos.apply {
-//            setHasFixedSize(true)
-//            layoutManager = linearLayoutManager
-//            adapter = adapterImgMemo
-//            // list변경될 때
-//            // adapterMyBook.dataMyBooks = arrayList!!
-//            //                adapterMyBook.notifyDataSetChanged()
-//        }
+        linearLayoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL,false)
+        mainAdapter = AdapterBookMemo(arrayList!!, applicationContext, this,email)
+        binding!!.rvBookMemos.apply {
+            setHasFixedSize(true)
+            layoutManager = linearLayoutManager
+            this@apply.adapter = mainAdapter
+        }
 
         /*
         카테고리 변경시 -> 반영
@@ -177,9 +173,19 @@ class ActivityDetailMyBook : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+
         /*
         메모 데이터 불러오기
          */
+        lifecycleScope.launch {
+            email = getEmailFromRoom(applicationContext)
+            mainAdapter.email = email
+            Log.i("정보태그","email->$email")
+            arrayList = amemo.getMemo(applicationContext,email,idx,3)!!
+            mainAdapter.dataList = arrayList!!
+            mainAdapter.notifyDataSetChanged()
+        }
+
 
 
     }

@@ -2,20 +2,29 @@ package com.example.books_ko.Adapter
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.books_ko.Data.Data_Book_Memo
+import com.example.books_ko.Data.SliderItem
 import com.example.books_ko.Function.FunctionCollection
+import com.example.books_ko.Function.SliderAdapterT1
+import com.example.books_ko.R
 import com.example.books_ko.databinding.ItemBookMemoBinding
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType
+import com.smarteist.autoimageslider.SliderAnimations
+import com.smarteist.autoimageslider.SliderView
+import java.lang.StringBuilder
 
 class AdapterBookMemo (
     var dataList: ArrayList<Data_Book_Memo> = ArrayList(),
     private val context: Context,
     private val activity : Activity,
-    private val email : String // 사용자의 이메일
+    var email : String // 사용자의 이메일
 ) : RecyclerView.Adapter<AdapterBookMemo.CustomViewHolder>(){
 
     lateinit var binding : ItemBookMemoBinding
@@ -35,6 +44,16 @@ class AdapterBookMemo (
     override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
         val binding = holder.binding
         val item = dataList[position]
+
+//        val testemail = email
+//
+//        if(item.follow){
+//            Log.i("정보태그","follow")
+//        }else if(item.email == email){
+//            Log.i("정보태그","자기자신")
+//        }else{
+//            Log.i("정보태그","follow아님")
+//        }
 
         /*
         데이터 셋팅
@@ -61,6 +80,36 @@ class AdapterBookMemo (
         /*
         이미지 가져오기(슬라이드 셋팅)
          */
+        val imgUrlList = item.imgUrls
+            .removeSurrounding("[", "]") // 대괄호 제거
+            .split(", ") // 구분자인 ", "로 분할
+            .map { it.removeSurrounding("\"") } // 각 아이템의 시작과 끝의 따옴표 제거
+            .toTypedArray()
+        imgUrlList.forEach {  Log.i("정보태그","imgUrl->${it}") }
+        /*
+        이미지 슬라이더
+         */
+        val imgSliderAdapter = SliderAdapterT1(context) // 어댑터 생성
+        binding.sliderView.setSliderAdapter(imgSliderAdapter) // 어댑터 셋팅
+        // 슬라이드 생성
+        binding.sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH)
+        binding.sliderView.setIndicatorSelectedColor(Color.WHITE)
+        binding.sliderView.setIndicatorUnselectedColor(Color.GRAY)
+        binding.sliderView.setScrollTimeInSec(3) // 스크롤 지연(초) 설정
+        binding.sliderView.setAutoCycle(true)
+        binding.sliderView.startAutoCycle() // 자동으로 뒤집기를 시작
+        binding.sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM);
+        binding.sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
+        // 데이터 넣기
+        val sliderItemList = imgUrlList.mapIndexed { index, imageUrl ->
+            SliderItem().apply {
+                description = "${index + 1}/${imgUrlList.size}"
+                this.imageUrl =context.getString(R.string.server_url)+imageUrl
+            }
+        }.toMutableList()
+        imgSliderAdapter.renewItems(sliderItemList) // 슬라이더에 리스트 반영
+
+
 
 
 

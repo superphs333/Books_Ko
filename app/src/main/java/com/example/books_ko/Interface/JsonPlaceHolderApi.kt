@@ -74,10 +74,10 @@ interface JsonPlaceHolderApi {
     @FormUrlEncoded
     @POST("About_Memo.php")
     open fun Get_Data_Book_Memos(
-        @Field("accept_sort") accept_sort: String?,
-        @Field("requester") requester: String?,
-        @Field("book_idx") book_idx: Int,
-        @Field("view") view: String?
+        @Field("accept_sort") accept_sort: String,
+        @Field("email") email: String?,
+        @Field("book_idx") book_idx: Int?,
+        @Field("view") view: Int?
     ): retrofit2.Call<ApiResponse<ApiData>>
 
     /*

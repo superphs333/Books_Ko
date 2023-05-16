@@ -14,6 +14,7 @@ class Activity_Book_Memos : AppCompatActivity() {
 
     var book_idx = 0 // 책 고유값
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityBookMemosBinding.inflate(layoutInflater)
