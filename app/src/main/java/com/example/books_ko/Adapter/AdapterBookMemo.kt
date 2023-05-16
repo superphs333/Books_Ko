@@ -114,6 +114,24 @@ class AdapterBookMemo (
             }
         }
         /*
+        팔로우
+         */
+        binding.txtFollow.setOnClickListener{itemFollow ->
+            if(item.follow == 0){ // 팔로우 상태가 아닌 경우에만
+                val map: MutableMap<String, String> = HashMap()
+                map["from_email"] = email
+                map["to_email"] = item.email
+                CoroutineScope(Dispatchers.Main).launch  {
+                    val goServer = fc.goServer(context,"following",map)
+                    if(goServer){
+                        binding.txtFollow.visibility = View.GONE
+                        item.follow = 1
+                        notifyDataSetChanged()
+                    }
+                }
+            }
+        }
+        /*
         이미지 가져오기(슬라이드 셋팅)
          */
         val imgUrlList = item.imgUrls

@@ -21,5 +21,5 @@ data class Data_Book_Memo(
     val open: String,
     val thumbnail: String,
     var checkHeart: Int,
-    val follow: Int
+    var follow: Int
 ) : Parcelable
