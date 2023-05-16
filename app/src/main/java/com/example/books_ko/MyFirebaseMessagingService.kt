@@ -102,6 +102,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 //                channel_name = "채팅"
 //                remoteviews = getCustomDesign_for_Chatting(map)
 //            }
+            "For_memo_like" -> {
+                intent = Intent(this, Activity_Management_Follow::class.java)
+                channel_id = getString(R.string.Channel_ID_Follow)
+                channel_name = "메모 좋아요"
+                remoteviews = getCustomDesign(map)
+            }
         }
         intent!!.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 

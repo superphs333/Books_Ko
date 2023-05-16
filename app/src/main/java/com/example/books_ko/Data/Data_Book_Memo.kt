@@ -8,7 +8,7 @@ import kotlinx.android.parcel.Parcelize
 data class Data_Book_Memo(
     val idx: Int,
     val page: Int,
-    val countHeart: Int,
+    var countHeart: Int,
     val countComment: Int,
     val email: String,
     val nickname: String,
@@ -20,6 +20,6 @@ data class Data_Book_Memo(
     val memo: String,
     val open: String,
     val thumbnail: String,
-    val checkHeart: Boolean,
-    val follow: Boolean
+    var checkHeart: Int,
+    val follow: Int
 ) : Parcelable

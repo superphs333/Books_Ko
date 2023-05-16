@@ -69,10 +69,6 @@ class Activity_Book_Memos : AppCompatActivity() {
             }
         }
 
-
-
-
-
         /*
         리사이클러뷰 변수
          */
@@ -88,21 +84,6 @@ class Activity_Book_Memos : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
-        /*
-        메모 데이터 불러오기
-         */
-//        lifecycleScope.launch {
-//            // view mode
-//            var viewMode = 0
-//
-//            email = AboutMember.getEmailFromRoom(applicationContext)
-//            mainAdapter.email = email
-//            Log.i("정보태그","email->$email")
-//            arrayList = amemo.getMemo(applicationContext,email,book_idx,R.string.memoSortWhole)!!
-//            mainAdapter.dataList = arrayList!!
-//            mainAdapter.notifyDataSetChanged()
-//        }
     }
 
     // 메모를 추가 할 수 있는 액티비티로 이동(Activity_Add_Memo)

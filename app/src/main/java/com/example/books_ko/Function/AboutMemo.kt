@@ -56,6 +56,7 @@ object AboutMemo {
 
         try {
             val response = myApi.Get_Data_Book_Memos(accept_sort, email,book_idx,view).execute()
+            Log.i("정보태그",response.body()!!.data!!.memoList.toString())
             if (response.isSuccessful) {
                 val result = response.body()
                 if (result?.status == "success"){

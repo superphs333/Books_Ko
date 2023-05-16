@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.books_ko.Data.Data_Book_Memo
@@ -18,7 +19,9 @@ import com.example.books_ko.databinding.ItemBookMemoBinding
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType
 import com.smarteist.autoimageslider.SliderAnimations
 import com.smarteist.autoimageslider.SliderView
-import java.lang.StringBuilder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AdapterBookMemo (
     var dataList: ArrayList<Data_Book_Memo> = ArrayList(),
@@ -63,7 +66,7 @@ class AdapterBookMemo (
             .load(dataList.get(position).profileUrl)
             .into(binding.imgProfile)
         binding.txtNickname.text = item.nickname // 닉네임
-        binding.txtFollow.visibility = if (item.follow || item.email == email) View.GONE else View.VISIBLE // 팔로우(자기자신이 아니거나, 팔로우 상태가 아닌 경우에만)
+        binding.txtFollow.visibility = if (item.follow==1 || item.email == email) View.GONE else View.VISIBLE // 팔로우(자기자신이 아니거나, 팔로우 상태가 아닌 경우에만)
         binding.txtPage.text = "${item.page}p" // 페이지
         binding.txtHeartCount.text = item.countHeart.toString() // 하트개수
         binding.txtCommentCount.text = item.countComment.toString() // 댓글개수
@@ -76,6 +79,39 @@ class AdapterBookMemo (
             "all" -> binding.txtOpen.text = "전체"
             "follow" -> binding.txtOpen.text = "팔로우"
             else -> binding.txtOpen.text = "비공개"
+        }
+        /*
+        좋아요
+         */
+        // 표시
+        binding.imgHeart.setImageResource(if (item.checkHeart==1) R.drawable.fill_heart else R.drawable.empty_heart)
+        // 좋아요 기능
+        binding.imgHeart.setOnClickListener{itemHeart ->
+            //Log.i("정보태그", "checkHeart->"+dataList[position].checkHeart)
+            CoroutineScope(Dispatchers.Main).launch {
+                val map: MutableMap<String, String> = HashMap()
+                map["p_idx_memo"] = item.idx.toString()
+                map["p_email"] = email
+                if(item.checkHeart == 0 && !item.email.equals(email)){
+                    map["alarm"] = "true"
+                }
+                val goServerForResult = fc.goServerForResult(context,"Update_heart_check",map)
+                if(goServerForResult["status"]=="success"){
+                    //Log.i("정보태그","goServerForResult : ${goServerForResult}")
+                    // 하트 상태 변경
+                    val drawableResId = if (item.checkHeart == 1) R.drawable.empty_heart else R.drawable.fill_heart
+                    val drawable = context.getDrawable(drawableResId)
+                    item.checkHeart = if (item.checkHeart == 1) 0 else 1
+                    // 하트 갯수 변경
+                    val data: Map<String, Any> = goServerForResult["data"] as Map<String, Any>
+                    //Log.i("정보태그", "data->"+data)
+                    binding.txtHeartCount.text = data["heartCount"].toString()
+                    item.countHeart = data["heartCount"].toString().toIntOrNull() ?: 0
+                    notifyDataSetChanged()
+                }else{
+                    Toast.makeText(context, context.getString(R.string.toast_error), Toast.LENGTH_LONG).show()
+                }
+            }
         }
         /*
         이미지 가져오기(슬라이드 셋팅)
