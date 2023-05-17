@@ -43,6 +43,15 @@ class Fragment_mypage : Fragment() {
             startActivity(intent)
         }
 
+        /*
+        닉네임 변경 액티비티로 이동
+         */
+        binding!!.txtNickname.setOnClickListener{
+            val intent = Intent(context, Activity_Set_nickname::class.java)
+            intent.putExtra("why_change","only_change")
+            startActivity(intent)
+        }
+
         // Inflate the layout for this fragment
         return binding?.root
     }

@@ -7,8 +7,15 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.room.Room
+import com.example.books_ko.DataBase.UserDatabase
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.databinding.ActivitySetNicknameBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private lateinit var binding: ActivitySetNicknameBinding
 
@@ -17,12 +24,17 @@ private lateinit var binding: ActivitySetNicknameBinding
 var sns_id="";
 var profile_url="";
 var login_email="";
+var now_nickname = ""
 
-var why_change = ""; // 닉네임 변경 목적
+
+var why_change = ""; // 닉네임 변경 목적 : 회원가입(signup), 닉네임 변경(only_change)
 
 val am = AboutMember;
 
 var nick_no_double=false
+
+private lateinit var database : UserDatabase
+
 
 
 class Activity_Set_nickname : AppCompatActivity() {
@@ -34,6 +46,10 @@ class Activity_Set_nickname : AppCompatActivity() {
         setContentView(R.layout.activity_set_nickname)
         binding = ActivitySetNicknameBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        database = Room.databaseBuilder(applicationContext, UserDatabase::class.java, "app_database").build()
+        val userLiveData = database.userDao().getUser()
+
 
         /*
         닉네임 변경 목적 확인 : 회원가입(signup)
@@ -48,7 +64,24 @@ class Activity_Set_nickname : AppCompatActivity() {
                 login_email = intent.getStringExtra("login_email")!!
 
             }
-            "reason2" -> {
+            "only_change" -> {
+                binding.btnSignup.text = "닉네임 변경"
+                // 회원정보 가져오기
+                CoroutineScope(Dispatchers.IO).launch {
+                    withContext(Dispatchers.Main) {
+                        userLiveData.observe(activity, Observer { userData ->
+                            login_email = userData.email
+                            CoroutineScope(Dispatchers.IO).launch {
+                                now_nickname = AboutMember.getMemberInfo(applicationContext, login_email, "nickname")
+                                Log.i("정보태그", "now_nickname->$now_nickname")
+                                withContext(Dispatchers.Main){
+                                    binding.editNick.setText(now_nickname)
+                                }
+                            }
+                        })
+                    }
+                }
+
 
             }
         }
@@ -89,7 +122,8 @@ class Activity_Set_nickname : AppCompatActivity() {
         if (why_change == "signup") { // 회원가입
             am.google_sign_up(activity,applicationContext,login_email, sns_id, binding.editNick.text.toString(), profile_url)
         } else if (why_change == "only_change") { // 닉네임변경
-           // am.Change_Member_Info("nickname", binding.editNick.text.toString(), login_email)
+            AboutMember.Change_Member_Info(applicationContext,this@Activity_Set_nickname,"nickname",binding.editNick.text.toString(),
+                login_email)
         }
     }
 
@@ -104,7 +138,15 @@ class Activity_Set_nickname : AppCompatActivity() {
             return
         }
 
-        // 닉네임 중복 확인
+        // 이전 닉네임과 같을 때
+        if(binding.editNick.text.toString()==now_nickname){
+            Toast.makeText(
+                applicationContext,
+                getString(R.string.nickname_before_equal),
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
 
         // 닉네임 중복 확인
         am.chk_double("nickname", binding.editNick, object : AboutMember.VolleyCallback {

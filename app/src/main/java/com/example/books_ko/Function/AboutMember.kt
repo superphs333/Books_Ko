@@ -497,7 +497,9 @@ object AboutMember{
                    database = Room.databaseBuilder(context, UserDatabase::class.java, "app_database").build()
                     // 정보 Room에 업데이트
                    if(sort=="nickname"){
-                       database.userDao().updateUserNickName(email,input)
+                       CoroutineScope(Dispatchers.IO).launch {
+                           database.userDao().updateUserNickName(email, input)
+                       }
                    }
 
                    /*

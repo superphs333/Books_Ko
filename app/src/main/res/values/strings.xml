@@ -16,6 +16,7 @@
     <string name="toast_nickname">닉네임을 확인해주세요</string>
     <string name="toast_nickname_double">중복된 닉네임이 존재합니다</string>
     <string name="nickname_before_equal">현재 닉네임과 같은 닉네임입니다.</string>
+    <string name="changeSuccessNickname">닉네임이 변경되었습니다.</string>
     <string name="toast_pw">비밀번호를 확인해주세요</string>
     <string name="toast_pw_double_chk">비밀번호와 비밀번호 확인은 일치해야 합니다</string>
     <string name="no_send_email">전송된 인증코드가 없습니다</string>
