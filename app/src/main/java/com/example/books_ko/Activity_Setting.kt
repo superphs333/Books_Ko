@@ -14,8 +14,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.example.books_ko.Data.UserData
 import com.example.books_ko.DataBase.UserDatabase
+import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.databinding.ActivitySettingBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -24,6 +26,7 @@ import kotlinx.coroutines.withContext
 private lateinit var binding: ActivitySettingBinding
 private lateinit var database : UserDatabase
 var email=""
+var platform_type=""
 private var mAuth: FirebaseAuth? = null
 
 
@@ -40,6 +43,7 @@ class Activity_Setting : AppCompatActivity() {
                 val userData: UserData = database.userDao().getUser2()
                 Log.i("정보태그","userData->${userData}")
                 email = userData.email
+                platform_type = userData.platform_type
                 val platformType = userData.platform_type
                 if(platformType!=applicationContext.getString(R.string.normal)){ // 일반 로그인 외에는 비밀번호 변경 버튼 숨김
                     withContext(Dispatchers.Main) {
@@ -128,6 +132,57 @@ class Activity_Setting : AppCompatActivity() {
             val intent = Intent(applicationContext, MainActivity::class.java)
             ActivityCompat.finishAffinity(this@Activity_Setting)
             startActivity(intent)
+        }
+    }
+
+    /*
+    회원탈퇴
+    : 데이터베이스에서 해당 email에 해당하는 정보 삭제 -> 구글 로그인이면 추가 처리 -> delete_and_intent -> mainactivity로 이동
+     */
+    // [개선] 탈퇴하기 전에 알림창ㅣ
+    // [개선] 구글탈퇴 부분 다시 확인해보기
+    fun withdrawal(view: View){
+        Log.i("정보태그","email->$email")
+        Log.i("정보태그","platform_type->$platform_type")
+        lifecycleScope.launch {
+
+            val map: MutableMap<String, String> = HashMap()
+            map["email"] = email
+            val goServer = FunctionCollection.goServer(applicationContext, "withdrawal", map)
+
+            if(goServer){ // 데이터베이스에서 내용 삭제 완료
+
+                if(platform_type=="google"){ // 구글로그인 경우 추가적인 처리
+                    Log.i("정보태그","google 로그인")
+                    val user = FirebaseAuth.getInstance().currentUser
+                    user?.delete()
+                        ?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Log.d("정보태그", "User account deleted.")
+                            }else{
+                                Log.d("정보태그", "User account deleted 실패")
+                                Log.d("정보태그", "User account deleted 실패: ${task.exception}")
+                            }
+                        }
+                }else{
+                    Log.i("정보태그","일반 로그인")
+                }
+
+                delete_and_intent()
+
+                Toast.makeText(
+                    applicationContext,
+                    "회원 탈퇴가 되었습니다.",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            }else{
+                Toast.makeText(
+                    applicationContext,
+                    getString(R.string.toast_error),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 }

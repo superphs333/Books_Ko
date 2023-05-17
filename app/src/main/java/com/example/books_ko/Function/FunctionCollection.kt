@@ -27,7 +27,7 @@ object FunctionCollection {
         val destination = when (accept_sort) {
             "edit_my_book", "delete_my_book" -> "About_Book.php"
             "save_chatting_room", "delete_rom", "edit_chatting_room", "get_chatting_room_info", "out_room", "join_room", "out_join_room", "get_chatting", "alarm_for_chatting" -> "About_Chatting.php"
-            "Change_Member_Info" -> "About_Member.php"
+            "Change_Member_Info","withdrawal" -> "About_Member.php"
             "following" -> "About_Follow.php"
             "Update_heart_check" -> "About_Memo.php"
             else -> ""
@@ -88,7 +88,7 @@ object FunctionCollection {
         val destination = when (accept_sort) {
             "edit_my_book", "delete_my_book" -> "About_Book.php"
             "save_chatting_room", "delete_rom", "edit_chatting_room", "get_chatting_room_info", "out_room", "join_room", "out_join_room", "get_chatting", "alarm_for_chatting" -> "About_Chatting.php"
-            "Change_Member_Info" -> "About_Member.php"
+            "Change_Member_Info","withdrawal" -> "About_Member.php"
             "following" -> "About_Follow.php"
             "Update_heart_check" -> "About_Memo.php"
             else -> ""
