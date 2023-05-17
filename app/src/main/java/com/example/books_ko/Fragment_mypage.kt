@@ -52,8 +52,24 @@ class Fragment_mypage : Fragment() {
             startActivity(intent)
         }
 
+        /*
+        프로필 이미지 변경
+         */
+        binding!!.imgProfile.setOnClickListener{
+            val intent = Intent(context, Activity_Change_Profile::class.java)
+            startActivity(intent)
+        }
+
         // Inflate the layout for this fragment
         return binding?.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // 닉네임 셋팅
+
+        // 프로필 이미지 셋팅
     }
 
 
