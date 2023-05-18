@@ -2,14 +2,15 @@ package com.example.books_ko.Adapter
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.books_ko.Activity_Add_Comment
 import com.example.books_ko.Data.Data_Book_Memo
 import com.example.books_ko.Data.SliderItem
 import com.example.books_ko.Function.FunctionCollection
@@ -130,6 +131,15 @@ class AdapterBookMemo (
                     }
                 }
             }
+        }
+        /*
+        댓글이미지 -> 해당 메모에 대한 댓글다는 액티비티로 이동
+         */
+        binding.imgComment.setOnClickListener{
+            val intent = Intent(context, Activity_Add_Comment::class.java)
+            intent.putExtra("idx_memo", item.idx)
+            intent.putExtra("writer_email",item.email)
+            activity.startActivity(intent)
         }
         /*
         이미지 가져오기(슬라이드 셋팅)

@@ -40,6 +40,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".Activity_Add_Comment"
+            android:exported="false" />
+        <activity
             android:name=".Activity_Change_Profile"
             android:exported="false" />
         <activity
