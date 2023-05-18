@@ -138,7 +138,7 @@ class AdapterBookMemo (
         binding.imgComment.setOnClickListener{
             val intent = Intent(context, Activity_Add_Comment::class.java)
             intent.putExtra("idx_memo", item.idx)
-            intent.putExtra("writer_email",item.email)
+            intent.putExtra("memo_writer_email",item.email)
             activity.startActivity(intent)
         }
         /*

@@ -4,7 +4,7 @@ package com.example.books_ko.Data
 data class Data_Comment_Memo(
     var idx_memo: Int,
     var idx: Int,
-    var login_value: String,
+    var email: String,
     var nickname: String,
     var profile_url: String,
     var comment: String,
@@ -17,7 +17,7 @@ data class Data_Comment_Memo(
     constructor(
         idx_memo: Int,
         idx: Int,
-        login_value: String,
+        email: String,
         nickname: String,
         profile_url: String,
         comment: String,
@@ -25,5 +25,5 @@ data class Data_Comment_Memo(
         group_idx: Int,
         depth: Int,
         visibility: Int
-    ) : this(idx_memo, idx, login_value, nickname, profile_url, comment, date_time, group_idx, depth, null, visibility)
+    ) : this(idx_memo, idx, email, nickname, profile_url, comment, date_time, group_idx, depth, null, visibility)
 }

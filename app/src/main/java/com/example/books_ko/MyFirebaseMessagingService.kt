@@ -108,6 +108,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 channel_name = "메모 좋아요"
                 remoteviews = getCustomDesign(map)
             }
+            "For_Comment" -> {
+                intent = Intent(this, Activity_Management_Follow::class.java) // [개선] 변경해야함
+                channel_id = getString(R.string.Channel_ID_MEMO_COMMENT)
+                channel_name = "메모댓글"
+                remoteviews = getCustomDesign(map)
+            }
         }
         intent!!.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 

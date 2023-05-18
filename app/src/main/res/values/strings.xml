@@ -73,6 +73,7 @@
     <string name="Channel_ID_SNS">SNS</string>
     <string name="Channel_ID_Chatting_Wating">Chatting_Wating</string>
     <string name="Channel_ID_Follow">Follow</string>
+    <string name="Channel_ID_MEMO_COMMENT">Comment</string>
 
     <!--
 메모관련
