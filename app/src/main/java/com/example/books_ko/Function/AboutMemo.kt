@@ -36,6 +36,7 @@ import java.io.IOException
 object AboutMemo {
     val appHelper = AppHelper();
     private lateinit var database: UserDatabase
+    var mode = ""
 
 
     suspend fun  getMemo(

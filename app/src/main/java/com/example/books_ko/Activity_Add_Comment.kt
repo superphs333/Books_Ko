@@ -6,14 +6,14 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
-import com.example.books_ko.Adapter.AdapterBookMemo
 import com.example.books_ko.Adapter.AdapterCommentMemo
-import com.example.books_ko.Data.Data_Book_Memo
+
 import com.example.books_ko.Data.Data_Comment_Memo
 import com.example.books_ko.DataBase.UserDatabase
 import com.example.books_ko.Function.AboutMember
@@ -37,8 +37,10 @@ class Activity_Add_Comment : AppCompatActivity() {
     var login_email = "" // 댓글 작성자 이메일
     var login_profileUrl = "" // 댓글 작성자 프로필 이미지
 
+
     // mode -> add, edit, add_comment(대댓글추가), edit2(대댓글 수정)
     var mode = "add"
+    var temp_position = 0
 
     /*
     리사이클러뷰
@@ -78,6 +80,54 @@ class Activity_Add_Comment : AppCompatActivity() {
                  */
                 linearLayoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL,false)
                 mainAdapter = AdapterCommentMemo(arrayList!!, applicationContext, this@Activity_Add_Comment,login_email)
+                // 대댓글 닫기 버튼
+                mainAdapter.setOnReplyItemClickListener(object : AdapterCommentMemo.OnItemClickListener {
+                    override fun onItemClick(v: View, position: Int) {
+                        Log.d("정보태그", "[setOnReplyItemClickListener](txt_reply)position=$position")
+
+                        // edit_comment에 포커스, mode= add2
+                        mode = "add_comment"
+                        binding.editComment.requestFocus()
+                        // 키보드 올리기
+                        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.showSoftInput(binding.editComment, InputMethodManager.SHOW_IMPLICIT)
+                        temp_position = position
+                        binding.linearTo.visibility = View.VISIBLE // ~님께 댓글 다는중 부분
+                        // txt_target_nickname 셋팅
+                        Log.i("정보태그","arrayList->${mainAdapter.dataList.toString()}")
+                        binding.txtTargetNickname.text = mainAdapter.dataList[position].nickname
+                    }
+                })
+                // 기능 버튼 -> 수정, 삭제
+                mainAdapter.setOnFunctionItemClickListener(object : AdapterCommentMemo.OnItemClickListener{
+                    override fun onItemClick(v: View, position: Int) {
+                        Log.d("정보태그", "[setOnFunctionItemClickListener](txt_reply)position=$position")
+                        val options = arrayOf("수정", "삭제")
+                        AlertDialog.Builder(this@Activity_Add_Comment)
+                            .setTitle("선택하세요")
+                            .setNegativeButton("취소", null)
+                            .setItems(options) { dialog, which ->
+                                when (options[which]) {
+                                    "수정" -> {
+                                        binding.editComment.setText(arrayList[position].comment)
+                                        binding.editComment.requestFocus()
+                                        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                                        imm.showSoftInput(binding.editComment, InputMethodManager.SHOW_IMPLICIT)
+                                        mode = "edit"
+                                        binding.btnComment.text = "수정"
+                                        temp_position = position
+                                    }
+                                    "삭제" -> Management_Comment("delete", arrayList[position].idx, position)
+                                }
+                            }
+                            .show()
+
+
+                    }
+                })
+
+
+
                 withContext(Dispatchers.Main) {
                     binding!!.rvComments.apply {
                         setHasFixedSize(true)
@@ -98,6 +148,8 @@ class Activity_Add_Comment : AppCompatActivity() {
 
     }
 
+
+
     fun onClick(view: View) {
         val id: Int = view.getId()
         when (id) {
@@ -105,7 +157,7 @@ class Activity_Add_Comment : AppCompatActivity() {
             R.id.btn_comment -> when (mode) {
                 "add" -> Management_Comment("add", 0, 0)
 //                "edit" -> Management_Comment("edit", arrayList[temp_position].idx, temp_position)
-//                "add_comment" -> Management_Comment("add_comment", arrayList[temp_position].group_idx, temp_position)
+                "add_comment" -> Management_Comment("add_comment", mainAdapter.dataList[temp_position].group_idx, temp_position)
             }
             R.id.txt_cancel -> {
                 mode = "add"
@@ -113,16 +165,23 @@ class Activity_Add_Comment : AppCompatActivity() {
                 val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 manager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             }
+            R.id.txt_cancel -> { // 대댓글 취소
+                mode = "add"
+                binding.linearTo.visibility = View.GONE // 대댓글을 달지 않는 상태에서는 linear_to가 보이지 않아야 한다
+                // 키보드 내리기
+                val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                manager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+
+            }
         }
     }
 
     /*
     댓글을 추가, 수정, 삭제하는 함수
      */
-    private fun Management_Comment(sort:String, idx:Int, position:Int){
+    private fun Management_Comment(sort:String, group_idx:Int, position:Int){
         // sort = add, add_comment, edit, delete
-
-        // 날짜, 시간
+        // idx = group_idx
 
         // 날짜, 시간
         val now = System.currentTimeMillis()
@@ -142,11 +201,17 @@ class Activity_Add_Comment : AppCompatActivity() {
                 map["memo_writer_email"] =  memo_writer_email
                 map["date_time"] =  date_time
             }
+            "add_comment" -> { // 대댓글
+                map["email"] = email
+                map["group_idx"] = group_idx.toString()
+                map["comment"] =  binding.editComment.text.toString()
+                map["date_time"] =  date_time
+            }
 
 
         }
 
-
+        Log.i("정보태그","map->$map")
         lifecycleScope.launch {
             val goServerForResult = FunctionCollection.goServerForResult(applicationContext,"Management_Comment",map)
             if(goServerForResult["status"]=="success"){
@@ -169,6 +234,20 @@ class Activity_Add_Comment : AppCompatActivity() {
                         mainAdapter.dataList.add(cm)
                         mainAdapter.notifyDataSetChanged()
                     }
+                    "add_comment" -> {
+                        // 값추가
+                        // [개선] 추가된 값만 부모댓글에서 추가하기
+                        CoroutineScope(Dispatchers.IO).launch {
+                            mainAdapter.dataList =
+                                AboutMemo.getMemoComments(applicationContext,login_email,idx_memo,0)!!
+                            withContext(Dispatchers.Main){
+                                mainAdapter.notifyDataSetChanged()
+                            }
+                        }
+
+                        mode = "add"
+                        binding.linearTo.visibility = View.GONE
+                    }
                 }
 
                 // 댓글 입력부 빈값
@@ -183,4 +262,6 @@ class Activity_Add_Comment : AppCompatActivity() {
         }
 
     }
+
+
 }

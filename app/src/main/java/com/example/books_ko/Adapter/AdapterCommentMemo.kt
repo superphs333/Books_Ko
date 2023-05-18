@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.books_ko.Data.Data_Comment_Memo
+import com.example.books_ko.Function.AboutMemo.mode
 import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.R
 import com.example.books_ko.databinding.ItemCommentBinding
@@ -18,16 +19,53 @@ class AdapterCommentMemo (
     var dataList: ArrayList<Data_Comment_Memo> = ArrayList(),
     private val context: Context,
     private val activity : Activity,
-    var email : String // 사용자의 이메일
+    var email : String, // 사용자의 이메일
 ) : RecyclerView.Adapter<AdapterCommentMemo.CustomViewHolder>(){
 
     lateinit var binding : ItemCommentBinding
     val fc = FunctionCollection
+    private var mFunctionListener: OnItemClickListener? = null
+    private var mReplyListener: OnItemClickListener? = null
+
+
+    fun setOnFunctionItemClickListener(listener: OnItemClickListener) {
+        mFunctionListener = listener
+    }
+
+    fun setOnReplyItemClickListener(listener: OnItemClickListener) {
+        mReplyListener = listener
+    }
+
+
 
     inner class CustomViewHolder(val binding: ItemCommentBinding) : RecyclerView.ViewHolder(binding.root){
+
+        init{
+            binding.txtFunction.setOnClickListener {
+                val pos = adapterPosition
+                if (pos != RecyclerView.NO_POSITION) {
+                    mFunctionListener?.onItemClick(it, pos)
+                }
+            }
+
+            binding.txtReply.setOnClickListener {
+                val pos = adapterPosition
+                if (pos != RecyclerView.NO_POSITION) {
+                    mReplyListener?.onItemClick(it, pos)
+                }
+            }
+        }
+
         fun getAbsoluteAdapterPosition(): Int {
             return adapterPosition
         }
+
+
+    }
+
+
+    interface OnItemClickListener {
+        fun onItemClick(v: View, position: Int)
     }
 
 
@@ -74,12 +112,12 @@ class AdapterCommentMemo (
             holder.itemView.layoutParams = params
             binding.txtTargetNickname.visibility = View.GONE
         }
-        holder.itemView.setOnClickListener {
-            Log.i(
-                "정보태그",
-                "depth=" + item.depth + ", group_idx=" + item.group_idx
-            )
-        }
+//        holder.itemView.setOnClickListener {
+//            Log.i(
+//                "정보태그",
+//                "depth=" + item.depth + ", group_idx=" + item.group_idx
+//            )
+//        }
 
 
 //        binding.txtFollow.visibility = if (item.follow==1 || item.email == email) View.GONE else View.VISIBLE // 팔로우(자기자신이 아니거나, 팔로우 상태가 아닌 경우에만)
@@ -97,3 +135,4 @@ class AdapterCommentMemo (
 
 
 }
+

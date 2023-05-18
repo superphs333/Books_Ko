@@ -100,7 +100,7 @@ object FunctionCollection {
             url,
             Response.Listener<String> { response ->
                 // 정상 응답
-                Log.i("정보태그", "(go_server)response=>$response")
+                Log.i("정보태그", "($accept_sort-go_server)response=>$response")
                 /*
                 ex)
                 {
