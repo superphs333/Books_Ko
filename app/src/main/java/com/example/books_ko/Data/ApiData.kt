@@ -14,5 +14,6 @@ data class ApiData (
     val chattingRoomList:ArrayList<Data_Chatting_Room>,
     val dataJoinPeopleList:ArrayList<Data_Join_People>,
     val memoList:ArrayList<Data_Book_Memo>,
+    val memoCommentList:ArrayList<Data_Comment_Memo>,
         )
 

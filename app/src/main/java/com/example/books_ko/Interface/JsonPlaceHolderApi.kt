@@ -89,6 +89,19 @@ interface JsonPlaceHolderApi {
     ): retrofit2.Call<ApiResponse<ApiData>>
 
     /*
+    메모 댓글 리스트
+     */
+    @FormUrlEncoded
+    @POST("About_Memo.php")
+    open fun Get_Data_Book_Memo_Comments(
+        @Field("accept_sort") accept_sort: String,
+        @Field("idx_memo") idx_memo: Int?,
+        @Field("email") email: String?,
+        @Field("view") view: Int? // 0(메모의 댓글), 1(내 댓글)
+    ): retrofit2.Call<ApiResponse<ApiData>>
+
+
+    /*
     채팅방 리스트
      */
     @FormUrlEncoded

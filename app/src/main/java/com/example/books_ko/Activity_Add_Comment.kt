@@ -17,6 +17,7 @@ import com.example.books_ko.Data.Data_Book_Memo
 import com.example.books_ko.Data.Data_Comment_Memo
 import com.example.books_ko.DataBase.UserDatabase
 import com.example.books_ko.Function.AboutMember
+import com.example.books_ko.Function.AboutMemo
 import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.databinding.ActivityAddCommentBinding
 import kotlinx.coroutines.CoroutineScope
@@ -83,7 +84,11 @@ class Activity_Add_Comment : AppCompatActivity() {
                         layoutManager = linearLayoutManager
                         adapter = mainAdapter
                     }
+                    mainAdapter.dataList =
+                        AboutMemo.getMemoComments(applicationContext,login_email,idx_memo,0)!!
+                    mainAdapter.notifyDataSetChanged()
                 }
+
             }
         })
 

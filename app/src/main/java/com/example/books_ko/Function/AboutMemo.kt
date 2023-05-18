@@ -17,6 +17,7 @@ import com.example.books_ko.Class.AppHelper
 import com.example.books_ko.Data.ApiData
 import com.example.books_ko.Data.DataMyBook
 import com.example.books_ko.Data.Data_Book_Memo
+import com.example.books_ko.Data.Data_Comment_Memo
 import com.example.books_ko.DataBase.UserDatabase
 import com.example.books_ko.Interface.JsonPlaceHolderApi
 import com.example.books_ko.R
@@ -61,6 +62,43 @@ object AboutMemo {
                 val result = response.body()
                 if (result?.status == "success"){
                     response.body()?.data?.memoList as ArrayList<Data_Book_Memo>?
+                } else {
+                    Log.i("정보태그", "[getMemo]서버에 연결은 되었으나 오류발생")
+                    null
+                }
+            } else {
+                Log.i("정보태그", "[getMemo]result.staus isSuccessful X")
+                null
+            }
+        } catch (e: IOException) {
+            null
+        }
+    }
+
+    suspend fun  getMemoComments(
+        context: Context,
+        email: String?,
+        idx_memo: Int?,
+        view: Int
+    ): ArrayList<Data_Comment_Memo>? = withContext(Dispatchers.IO) {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(context.getString(R.string.server_url))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val myApi = retrofit.create(JsonPlaceHolderApi::class.java)
+        val accept_sort = "Get_Comments"
+
+        // 보내는 값 확인
+        Log.d("정보태그", "email: $email, idx_memo: $idx_memo, view: $view")
+
+
+        try {
+            val response = myApi.Get_Data_Book_Memo_Comments(accept_sort,idx_memo,email,view).execute()
+            Log.i("정보태그",response.body()!!.data!!.memoCommentList.toString())
+            if (response.isSuccessful) {
+                val result = response.body()
+                if (result?.status == "success"){
+                    response.body()?.data?.memoCommentList as ArrayList<Data_Comment_Memo>?
                 } else {
                     Log.i("정보태그", "[getMemo]서버에 연결은 되었으나 오류발생")
                     null
