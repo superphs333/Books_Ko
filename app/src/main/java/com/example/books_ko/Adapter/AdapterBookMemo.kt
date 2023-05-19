@@ -1,6 +1,7 @@
 package com.example.books_ko.Adapter
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -23,6 +24,7 @@ import com.smarteist.autoimageslider.SliderView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AdapterBookMemo (
     var dataList: ArrayList<Data_Book_Memo> = ArrayList(),
@@ -172,6 +174,52 @@ class AdapterBookMemo (
             }
         }.toMutableList()
         imgSliderAdapter.renewItems(sliderItemList) // 슬라이더에 리스트 반영
+        /*
+        수정, 삭제 버튼
+         */
+        // 본인인 경우에만 보이도록
+        binding.txtFunction.visibility = if (email == item.email) View.VISIBLE else View.GONE
+        binding.txtFunction.setOnClickListener {
+            val options = arrayOf("수정", "삭제")
+
+            val dialog = AlertDialog.Builder(activity)
+                .setTitle("선택하세요")
+                .setNegativeButton("취소", null)
+                .setItems(options) { _, which ->
+                    val selectedItem = options[which]
+                    val memo = dataList[holder.adapterPosition]
+
+                    when (selectedItem) {
+                        "삭제" -> {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val map: MutableMap<String, String> = HashMap()
+                                map["idx"] = item.idx.toString()
+                                val goServerForResult = fc.goServerForResult(context,"Delete_Book_Memo",map)
+                                if(goServerForResult["status"]=="success"){
+                                    val data: Map<String, Any> = goServerForResult["data"] as Map<String, Any>
+                                    //Log.i("정보태그", "data->"+data)
+                                    withContext(Dispatchers.Main) {
+                                        dataList.removeAt(position)
+                                        notifyItemRemoved(position)
+                                    }
+                                }else{
+                                    Toast.makeText(context, context.getString(R.string.toast_error), Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
+//                        else -> {
+//                            val intent = Intent(context, Activity_Edit_Memo::class.java)
+//                            intent.putExtra("idx", memo.idx)
+//                            intent.putExtra("title", memo.title)
+//                            activity.startActivity(intent)
+//                        }
+                    }
+                }
+                .create()
+
+            dialog.show()
+        }
+
 
 
 
