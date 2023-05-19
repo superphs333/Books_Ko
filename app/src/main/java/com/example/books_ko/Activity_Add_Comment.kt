@@ -109,7 +109,7 @@ class Activity_Add_Comment : AppCompatActivity() {
                             .setItems(options) { dialog, which ->
                                 when (options[which]) {
                                     "수정" -> {
-                                        binding.editComment.setText(arrayList[position].comment)
+                                        binding.editComment.setText(mainAdapter.dataList[position].comment)
                                         binding.editComment.requestFocus()
                                         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                                         imm.showSoftInput(binding.editComment, InputMethodManager.SHOW_IMPLICIT)
@@ -117,7 +117,7 @@ class Activity_Add_Comment : AppCompatActivity() {
                                         binding.btnComment.text = "수정"
                                         temp_position = position
                                     }
-                                    "삭제" -> Management_Comment("delete", arrayList[position].idx, position)
+                                    "삭제" -> Management_Comment("delete", mainAdapter.dataList[position].idx, position)
                                 }
                             }
                             .show()
@@ -156,7 +156,7 @@ class Activity_Add_Comment : AppCompatActivity() {
             R.id.img_back -> finish()
             R.id.btn_comment -> when (mode) {
                 "add" -> Management_Comment("add", 0, 0)
-//                "edit" -> Management_Comment("edit", arrayList[temp_position].idx, temp_position)
+                "edit" -> Management_Comment("edit", mainAdapter.dataList[temp_position].idx, temp_position)
                 "add_comment" -> Management_Comment("add_comment", mainAdapter.dataList[temp_position].group_idx, temp_position)
             }
             R.id.txt_cancel -> {
@@ -206,6 +206,14 @@ class Activity_Add_Comment : AppCompatActivity() {
                 map["group_idx"] = group_idx.toString()
                 map["comment"] =  binding.editComment.text.toString()
                 map["date_time"] =  date_time
+                map["target"] =  mainAdapter.dataList[position].email
+            }
+            "edit" ->{ // 수정
+                map["idx"] = group_idx.toString()
+                map["comment"] =  binding.editComment.text.toString()
+            }
+            "delete" -> { // 삭제
+                map["idx"] = group_idx.toString()
             }
 
 
@@ -216,7 +224,10 @@ class Activity_Add_Comment : AppCompatActivity() {
             val goServerForResult = FunctionCollection.goServerForResult(applicationContext,"Management_Comment",map)
             if(goServerForResult["status"]=="success"){
                 val data: Map<String, String> = goServerForResult["data"] as Map<String, String>
-                val idx = data["idx"].toString().toInt()
+                var idx = 0
+                if(sort=="add" || sort=="add_comment"){
+                    idx = data["idx"].toString().toInt()
+                }
                 when(sort){
                     "add" -> {
                         val cm = Data_Comment_Memo(
@@ -247,6 +258,17 @@ class Activity_Add_Comment : AppCompatActivity() {
 
                         mode = "add"
                         binding.linearTo.visibility = View.GONE
+                    }
+
+                    "edit" -> {
+                        mainAdapter.dataList.get(position).comment = binding.editComment.text.toString()
+                        mainAdapter.notifyDataSetChanged()
+                        binding.btnComment.text = "전송"
+                        mode = "add"
+                    }
+                    "delete" -> {
+                        mainAdapter.dataList.get(position).visibility=0
+                        mainAdapter.notifyDataSetChanged()
                     }
                 }
 
