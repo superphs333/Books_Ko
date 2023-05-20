@@ -59,6 +59,8 @@ class Activity_Add_Memo : AppCompatActivity() {
             : ActivityResultLauncher<Intent>? = null
     private var rl_crop // 크롭
             : ActivityResultLauncher<Intent>? = null
+    private var rl_underline // 편집된 이미지
+            : ActivityResultLauncher<Intent>? = null
 
     var book_idx = 0 // 책 idx
     var memo_idx = 0 // 메모 idx
@@ -213,10 +215,31 @@ class Activity_Add_Memo : AppCompatActivity() {
             } else if (result.resultCode == UCrop.RESULT_ERROR) {
                 val cropError = UCrop.getError(result.data!!)
                 if (cropError != null) {
-                    Log.e("TAG", "UCrop error: ${cropError.message}")
+                    Log.e("정보태그", "UCrop error: ${cropError.message}")
                 }
             }
         }
+        // 편집된 이미지
+        rl_underline = registerForActivityResult<Intent, ActivityResult>(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                Log.d("정보태그", "(in onActivityResult) result=${data?.getStringExtra("result")}")
+                Log.d("정보태그", "(in onActivityResult) result=${data?.getStringExtra("position")}")
+
+                // You should convert it to absolute path
+                val url = data?.getStringExtra("result")
+                Log.d("정보태그", "url=$url")
+
+                // Change the image
+                adapterImgMemo.dataList[data?.getStringExtra("position")?.toIntOrNull() ?: 0].img =
+                    url!!
+                adapterImgMemo.notifyDataSetChanged()
+            }
+        }
+        adapterImgMemo.rl_underline = rl_underline as ActivityResultLauncher<Intent>
+
 
 
     }

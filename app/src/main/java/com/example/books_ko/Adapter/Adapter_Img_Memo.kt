@@ -2,12 +2,18 @@ package com.example.books_ko.Adapter
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.books_ko.Activity_Add_Chatting_Room
+import com.example.books_ko.Activity_Underline_Picture
 import com.example.books_ko.Data.Data_Img_Memo
 import com.example.books_ko.Function.ItemTouchHelperListener
 import com.example.books_ko.R
@@ -20,6 +26,7 @@ class Adapter_Img_Memo(
 ) : RecyclerView.Adapter<Adapter_Img_Memo.CustomViewHolder>(), ItemTouchHelperListener {
 
     lateinit var binding : ItemImgMemoBinding
+    lateinit var rl_underline : ActivityResultLauncher<Intent>
 
     inner class CustomViewHolder(val binding: ItemImgMemoBinding) : RecyclerView.ViewHolder(binding.root){
         fun getAbsoluteAdapterPosition(): Int {
@@ -66,6 +73,33 @@ class Adapter_Img_Memo(
             if (position < dataList.size) {
                 notifyItemRangeChanged(position, dataList.size - position)
             }
+        }
+
+        // 이미지 부분 클릭 -> 밑줄을 그을 수 있는 액티비티로 이동
+        binding.imgMemo.setOnClickListener{
+            val imgMemoClickListener = View.OnClickListener {
+//                val intent = Intent(context, Activity_Underline_Picture::class.java)
+//                intent.putExtra("img_url", item.img)
+//                intent.putExtra("position", position)
+//                Log.i("정보태그", "(binding.imgMemo.setOnClickListener)position=>" + position)
+//
+//                // [개선] 런처로 변경(근데 꼭 해야 하나?)
+//                activity.startActivityForResult(
+//                    intent,
+//                    context.getString(R.string.go_Activity_Underline_Picture).toInt()
+//                )
+
+
+                val intent = Intent(context, Activity_Underline_Picture::class.java).apply {
+                    putExtra("img_url", item.img)
+                    putExtra("position", position)
+                }
+                rl_underline.launch(intent)
+
+            }
+
+            binding.imgMemo.setOnClickListener(imgMemoClickListener)
+
         }
     }
 

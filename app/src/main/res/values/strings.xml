@@ -86,6 +86,11 @@
     <string name="memoSortMy">3</string>
 
     <!--
+startActivityForResult
+-->
+    <string name="go_Activity_Underline_Picture">999</string>
+
+    <!--
     채팅방 관련
     -->
     <string name="save_chatting_room">채팅방이 생성되었습니다.</string>
