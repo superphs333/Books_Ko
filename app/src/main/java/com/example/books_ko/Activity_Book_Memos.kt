@@ -58,7 +58,7 @@ class Activity_Book_Memos : AppCompatActivity() {
                     email = AboutMember.getEmailFromRoom(applicationContext)
                     mainAdapter.email = email
                     Log.i("정보태그","email->$email")
-                    arrayList = amemo.getMemo(applicationContext,email,book_idx,selectedIndex+1)!!
+                    arrayList = amemo.getMemo(applicationContext,email,book_idx,selectedIndex+1,false)!!
                     mainAdapter.dataList = arrayList!!
                     mainAdapter.notifyDataSetChanged()
                 }

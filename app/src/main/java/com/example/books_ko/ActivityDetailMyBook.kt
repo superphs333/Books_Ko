@@ -181,7 +181,7 @@ class ActivityDetailMyBook : AppCompatActivity() {
             email = getEmailFromRoom(applicationContext)
             mainAdapter.email = email
             Log.i("정보태그","email->$email")
-            arrayList = amemo.getMemo(applicationContext,email,idx,3)!!
+            arrayList = amemo.getMemo(applicationContext,email,idx,3,false)!!
             mainAdapter.dataList = arrayList!!
             mainAdapter.notifyDataSetChanged()
         }

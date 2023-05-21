@@ -44,7 +44,8 @@ object AboutMemo {
         context: Context,
         email: String,
         book_idx: Int,
-        view: Int
+        view: Int,
+        likeChk : Boolean
     ): ArrayList<Data_Book_Memo>? = withContext(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
             .baseUrl(context.getString(R.string.server_url))
@@ -58,7 +59,7 @@ object AboutMemo {
 
 
         try {
-            val response = myApi.Get_Data_Book_Memos(accept_sort, email,book_idx,view).execute()
+            val response = myApi.Get_Data_Book_Memos(accept_sort, email,book_idx,view,likeChk).execute()
             Log.i("정보태그",response.body()!!.data!!.memoList.toString())
             if (response.isSuccessful) {
                 val result = response.body()

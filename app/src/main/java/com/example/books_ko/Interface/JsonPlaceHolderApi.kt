@@ -86,7 +86,8 @@ interface JsonPlaceHolderApi {
         @Field("accept_sort") accept_sort: String,
         @Field("email") email: String?,
         @Field("book_idx") book_idx: Int?,
-        @Field("view") view: Int?
+        @Field("view") view: Int?,
+        @Field("likeChk") likeChk: Boolean?
     ): retrofit2.Call<ApiResponse<ApiData>>
 
     /*
