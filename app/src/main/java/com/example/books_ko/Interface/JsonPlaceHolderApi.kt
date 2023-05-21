@@ -125,4 +125,15 @@ interface JsonPlaceHolderApi {
         @Field("email") email : String
     ): retrofit2.Call<ApiResponse<ApiData>>
 
+    /*
+    팔로우, 팔로워
+     */
+    @FormUrlEncoded
+    @POST("About_Follow.php")
+    open fun Get_Follow(
+        @Field("accept_sort") accept_sort: String,
+        @Field("email") email: String,
+        @Field("sort") sort: String,
+    ): retrofit2.Call<ApiResponse<ApiData>>
+
 }

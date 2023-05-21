@@ -63,8 +63,8 @@ class Fragment_mypage : Fragment() {
                         if(image_Uri!=null || image_Uri!=""){
                             withContext(Dispatchers.Main){
                                 // 프로필 이미지 셋팅
-                                val glideImg = if (image_Uri!!.contains(getString(R.string.img_profile))) {
-                                    getString(R.string.server_url).removeSuffix("/") + image_Uri
+                                val glideImg = if (image_Uri!!.contains(context.getString(R.string.img_profile))) {
+                                    context.getString(R.string.server_url).removeSuffix("/") + image_Uri
                                 } else image_Uri
                                 Log.i("정보태그","glideImg->$glideImg")
                                 Glide.with(context).load(glideImg).into(binding!!.imgProfile)
