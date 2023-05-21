@@ -102,4 +102,10 @@ startActivityForResult
     -->
     <string name="delete">삭제</string>
     <string name="update">수정</string>
+
+    <!--
+     색상 : 선택 / 비선택
+     -->
+    <string name="choose_true">#afe3ff</string>
+    <string name="choose_false">#a0a0a0</string>
 </resources>

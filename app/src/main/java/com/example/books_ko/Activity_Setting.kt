@@ -17,7 +17,6 @@ import com.example.books_ko.DataBase.UserDatabase
 import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.databinding.ActivitySettingBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -184,5 +183,12 @@ class Activity_Setting : AppCompatActivity() {
                 ).show()
             }
         }
+    }
+
+    // 팔로우 관리 액티비티로 이동
+    fun Go_To_Management_Follow(view: View) {
+        val intent = Intent(applicationContext, Activity_Management_Follow::class.java)
+        intent.putExtra("email", email)
+        startActivity(intent)
     }
 }
