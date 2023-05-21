@@ -120,6 +120,7 @@ class AdapterBookMemo (
         /*
         팔로우
          */
+        // [개선] 리스트에 있는 같은 email가진 모두에게 팔로우 부분 사라지도록 해야 함
         binding.txtFollow.setOnClickListener{itemFollow ->
             if(item.follow == 0){ // 팔로우 상태가 아닌 경우에만
                 val map: MutableMap<String, String> = HashMap()
@@ -130,6 +131,12 @@ class AdapterBookMemo (
                     if(goServer){
                         binding.txtFollow.visibility = View.GONE
                         item.follow = 1
+                        dataList.forEach { dataItem ->
+                            if (dataItem.email == item.email) {
+                                binding.txtFollow.visibility = View.GONE
+                                item.follow = 1
+                            }
+                        }
                         notifyDataSetChanged()
                     }
                 }
