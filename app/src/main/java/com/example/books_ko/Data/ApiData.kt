@@ -9,6 +9,7 @@ data class ApiData (
     val move: String? = null,
     val pw: String? = null,
     val sql_insert: String? = null,
+    val sql_update: String? = null,
     val sql: String? = null,
     val bookList:ArrayList<DataMyBook>,
     val chattingRoomList:ArrayList<Data_Chatting_Room>,

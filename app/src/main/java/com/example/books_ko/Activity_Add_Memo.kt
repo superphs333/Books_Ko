@@ -16,7 +16,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.ItemTouchHelperCallback
@@ -24,6 +23,7 @@ import com.example.books_ko.Adapter.Adapter_Img_Memo
 import com.example.books_ko.Data.ApiData
 import com.example.books_ko.Data.Data_Img_Memo
 import com.example.books_ko.Function.AboutMember
+import com.example.books_ko.Function.AboutMemo.getOneMemo
 import com.example.books_ko.Function.AboutPicture
 import com.example.books_ko.Interface.JsonPlaceHolderApi
 import com.example.books_ko.databinding.ActivityAddMemoBinding
@@ -33,6 +33,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -80,6 +81,8 @@ class Activity_Add_Memo : AppCompatActivity() {
         book_idx = intent.getIntExtra("book_idx", 0)
         Log.i("정보태그", "book_idx=>$book_idx")
         binding.txtTitle.text = intent.getStringExtra("title") // 제목셋팅
+        memo_idx = intent.getIntExtra("memo_idx", 0)
+        Log.i("정보태그", "memo_idx => $memo_idx")
         // spinner셋팅
         val data = resources.getStringArray(R.array.select_memo_view)
         val adapterSpinner = ArrayAdapter(applicationContext, android.R.layout.simple_dropdown_item_1line, data)
@@ -107,6 +110,42 @@ class Activity_Add_Memo : AppCompatActivity() {
         }
         helper = ItemTouchHelper(ItemTouchHelperCallback(adapterImgMemo))
         helper.attachToRecyclerView(binding.rvMemoImgs)  // ItemTouchHelper를 제공된 RecyclerView에 붙인다
+
+
+        /*
+        만약 memo_idx가 0이 아니면, 서버에서 데이터를 가져온다
+         */
+        if(memo_idx>0){
+            lifecycleScope.launch {
+                val memo = getOneMemo(applicationContext, memo_idx)
+                if (memo != null) {
+                    binding.editMemo.setText(memo.memo)
+                    binding.editPage.setText(memo.page.toString())
+                    when (memo.open) {
+                        "all" -> binding.spinnerSelectOpen.setSelection(0)
+                        "follow" -> binding.spinnerSelectOpen.setSelection(1)
+                        "no" -> binding.spinnerSelectOpen.setSelection(2)
+                    }
+                    // 이미지
+                    val result = memo.imgUrls
+                        .trim('[', ']')   // 대괄호 제거
+                        .split(",")       // 쉼표를 기준으로 분리
+                        .map { it.trim(' ', '\"') }  // 양 끝의 공백과 따옴표 제거
+                        .map { if (it.startsWith("/")) it.substring(1) else it } // 맨 앞의 '/' 제거
+                        .map { Data_Img_Memo(it) }
+                        .toCollection(ArrayList())
+                    Log.i("정보태그","result->{$result}")
+                    adapterImgMemo.dataList = result
+                    adapterImgMemo.notifyDataSetChanged()
+                } else {
+                    // 서버에서 정보를 가져오는 데 실패한 경우의 처리
+
+                }
+            }
+        }else{
+            Log.i("정보태그","memoidx=0")
+        }
+
 
         /*
         사진 관련 registerForActivityResult
@@ -207,8 +246,7 @@ class Activity_Add_Memo : AppCompatActivity() {
                 }
                 // 이미지를 list에 추가한다
                 val dim = Data_Img_Memo(image_Uri!!)
-                arrayList!!.add(dim)
-                adapterImgMemo.dataList = arrayList!!
+                adapterImgMemo.dataList!!.add(dim)
                 adapterImgMemo.notifyDataSetChanged()
 
 
@@ -244,6 +282,12 @@ class Activity_Add_Memo : AppCompatActivity() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+
+
+    }
+
     // 메모 내용 서버로 전송
     fun send_to_SERVER(view: View) {
         /*
@@ -266,7 +310,7 @@ class Activity_Add_Memo : AppCompatActivity() {
         val accept_sort = tempAcceptSort.toRequestBody("text/plain".toMediaTypeOrNull())
         val forSendMemoIdx =memo_idx.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         val forSendBookIdx =book_idx.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-        val forSendImgSize =arrayList.size.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val forSendImgSize =adapterImgMemo.dataList.size.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         val forSendMemo = binding.editMemo.text.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         val forSendPage = binding.editPage.text.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         val open = when (binding.spinnerSelectOpen.selectedItem.toString()) {
@@ -276,26 +320,46 @@ class Activity_Add_Memo : AppCompatActivity() {
         }
         val forSendOpen = open.toRequestBody("text/plain".toMediaTypeOrNull())
         var images = mutableListOf<MultipartBody.Part>() // 이미지들을 담을 변수
-        Log.d("정보태그","imgDataList->"+arrayList)
-        for((index, imgData) in arrayList.withIndex()){
-            // 파일이름
-            val imgFileName = "Img_Book_Memo-${(1..1000000).random()}.jpg"
-            var imageFile: File? = null
-            if (ap.isAbsolutePath(imgData.img)) {
-                imageFile = File(imgData.img!!)
-            } else {
+        var imgOrderString = ArrayList<String>() // 이미지 주소를 담을 변수
+        Log.d("정보태그","imgDataList->"+adapterImgMemo.dataList)
+        for((index, imgData) in adapterImgMemo.dataList.withIndex()){
+            /*
+            분기
+                - 사용자의 기기에서 가져온 이미지 -> 서버에 저장
+                - 원래 서버에서 가져온 이미지 -> 파일 이름만
+             */
+            Log.i("정보태그","$index : ${imgData.img}")
+            if(!imgData.img.contains(getString(R.string.img_memo))){
+                // 파일이름
                 val imgFileName = "Img_Book_Memo-${(1..1000000).random()}.jpg"
-                imageFile = ap.getFileFromContentUri(Uri.parse(imgData.img), applicationContext, imgFileName)
+                var imageFile: File? = null
+                if (ap.isAbsolutePath(imgData.img)) {
+                    imageFile = File(imgData.img!!)
+                } else {
+                    val imgFileName = "Img_Book_Memo-${(1..1000000).random()}.jpg"
+                    imageFile = ap.getFileFromContentUri(Uri.parse(imgData.img), applicationContext, imgFileName)
+                }
+                val imageRequestBody  = imageFile!!.asRequestBody("image/jpeg".toMediaTypeOrNull())
+
+                // 전송이름
+                val fileName = "uploaded_file$index"
+                val imagePart = MultipartBody.Part.createFormData(fileName, imgFileName, imageRequestBody)
+                images.add(imagePart)
+                val toSaveIntoImgOrder = "/"+getString(R.string.img_memo)+"/"+imgFileName
+                imgOrderString.add(toSaveIntoImgOrder)
+            }else{
+                imgOrderString.add("/"+imgData.img)
             }
-            val imageRequestBody  = imageFile!!.asRequestBody("image/jpeg".toMediaTypeOrNull())
-
-            // 전송이름
-            val fileName = "uploaded_file$index"
-            val imagePart = MultipartBody.Part.createFormData(fileName, imgFileName, imageRequestBody)
-            images.add(imagePart)
         }
+        var imgOrderJoined = ""
+        if(memo_idx>0){
+            // 이미지 순서를 쉼표로 연결한 문자열로 만들고 전송
+            imgOrderJoined = imgOrderString.joinToString(separator = ",")
+        }
+        Log.i("정보태그","imgOrderString={$imgOrderJoined}");
+        val forSendImgOrder = imgOrderJoined.toRequestBody("text/plain".toMediaTypeOrNull())
 
-        myApi.sendDatatoMemo(forSendBookIdx,accept_sort,forSendImgSize,forSendMemo,forSendPage,forSendOpen,forSendEmail,forSendMemoIdx,images).enqueue(object :
+        myApi.sendDatatoMemo(forSendBookIdx,accept_sort,forSendImgSize,forSendMemo,forSendPage,forSendOpen,forSendEmail,forSendMemoIdx,images,forSendImgOrder).enqueue(object :
             Callback<ApiResponse<ApiData>> {
             override fun onResponse(call: Call<ApiResponse<ApiData>>, response: Response<ApiResponse<ApiData>>) {
                 var toString: String = response.raw().toString()

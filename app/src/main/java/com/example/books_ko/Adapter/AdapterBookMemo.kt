@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.books_ko.Activity_Add_Comment
+import com.example.books_ko.Activity_Add_Memo
 import com.example.books_ko.Data.Data_Book_Memo
 import com.example.books_ko.Data.SliderItem
 import com.example.books_ko.Function.FunctionCollection
@@ -207,12 +208,12 @@ class AdapterBookMemo (
                                 }
                             }
                         }
-//                        else -> {
-//                            val intent = Intent(context, Activity_Edit_Memo::class.java)
-//                            intent.putExtra("idx", memo.idx)
-//                            intent.putExtra("title", memo.title)
-//                            activity.startActivity(intent)
-//                        }
+                        else -> {
+                            val intent = Intent(context, Activity_Add_Memo::class.java)
+                            intent.putExtra("memo_idx", memo.idx)
+                            intent.putExtra("title", memo.title)
+                            activity.startActivity(intent)
+                        }
                     }
                 }
                 .create()

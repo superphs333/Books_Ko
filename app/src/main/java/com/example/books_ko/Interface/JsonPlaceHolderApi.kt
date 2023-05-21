@@ -69,7 +69,8 @@ interface JsonPlaceHolderApi {
         @Part("open") open: RequestBody,
         @Part("email") email: RequestBody,
         @Part("memo_idx") memo_idx: RequestBody,
-        @Part images: List<MultipartBody.Part>
+        @Part images: List<MultipartBody.Part>,
+        @Part("imgOrderJoined") imgOrderJoined: RequestBody
     ): retrofit2.Call<ApiResponse<ApiData>>
 
     /*

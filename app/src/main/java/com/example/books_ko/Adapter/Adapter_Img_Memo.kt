@@ -52,12 +52,12 @@ class Adapter_Img_Memo(
             notifyItemRangeChanged(position, dataMyBooks.size - position)
         }
          */
-        Log.i("정보태그","(onBindViewHolder)img->"+item.img)
+        //Log.i("정보태그","(onBindViewHolder)img->"+item.img)
 
         // 이미지 셋팅
         if (item.img.contains(context.getString(R.string.img_memo))) {
             Glide.with(holder.itemView.context)
-                .load(item.img)
+                .load(context.getString(R.string.server_url)+item.img)
                 .into(binding.imgMemo)
         } else {
             binding.imgMemo.setImageURI(Uri.parse(item.img))
@@ -78,6 +78,7 @@ class Adapter_Img_Memo(
         // 이미지 부분 클릭 -> 밑줄을 그을 수 있는 액티비티로 이동
         binding.imgMemo.setOnClickListener{
             val imgMemoClickListener = View.OnClickListener {
+                Log.i("정보태그","img_ur->{${item.img}}")
 //                val intent = Intent(context, Activity_Underline_Picture::class.java)
 //                intent.putExtra("img_url", item.img)
 //                intent.putExtra("position", position)
@@ -90,11 +91,11 @@ class Adapter_Img_Memo(
 //                )
 
 
-                val intent = Intent(context, Activity_Underline_Picture::class.java).apply {
-                    putExtra("img_url", item.img)
-                    putExtra("position", position)
-                }
-                rl_underline.launch(intent)
+//                val intent = Intent(context, Activity_Underline_Picture::class.java).apply {
+//                    putExtra("img_url", item.img)
+//                    putExtra("position", position)
+//                }
+//                rl_underline.launch(intent)
 
             }
 

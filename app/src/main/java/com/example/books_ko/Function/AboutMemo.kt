@@ -25,6 +25,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Call
@@ -112,5 +113,32 @@ object AboutMemo {
             null
         }
     }
+
+    suspend fun getOneMemo(
+        context: Context,
+        memo_idx: Int,
+    ): Data_Book_Memo? {
+        return CoroutineScope(Dispatchers.IO).async {
+            val map: MutableMap<String, String> = HashMap()
+            map["idx"] = memo_idx.toString()
+            val goServerForResult = FunctionCollection.goServerForResult(context, "Get_Memo_One", map)
+            if (goServerForResult["status"] == "success") {
+                val data: Map<String, Any> = goServerForResult["data"] as Map<String, Any>
+                val memoInfo : Map<String, String> = data["memoData"] as Map<String, String>
+                var returnMemoData = Data_Book_Memo()
+                returnMemoData.page = memoInfo["page"].toString().toInt()
+                returnMemoData.memo = memoInfo["memo"] as String
+                returnMemoData.open = memoInfo["open"] as String
+                returnMemoData.imgUrls = memoInfo["img_urls"] as String
+                returnMemoData
+            } else {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, context.getString(R.string.toast_error), Toast.LENGTH_LONG).show()
+                }
+                null
+            }
+        }.await()
+    }
+
 }
 

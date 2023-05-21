@@ -90,7 +90,7 @@ object FunctionCollection {
             "save_chatting_room", "delete_rom", "edit_chatting_room", "get_chatting_room_info", "out_room", "join_room", "out_join_room", "get_chatting", "alarm_for_chatting" -> "About_Chatting.php"
             "Change_Member_Info","withdrawal" -> "About_Member.php"
             "following" -> "About_Follow.php"
-            "Update_heart_check","Management_Comment","Delete_Book_Memo"-> "About_Memo.php"
+            "Update_heart_check","Management_Comment","Delete_Book_Memo","Get_Memo_One"-> "About_Memo.php"
             else -> ""
         }
 
