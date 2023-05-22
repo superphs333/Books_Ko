@@ -21,6 +21,7 @@ import com.example.books_ko.databinding.ItemJoinPeopleBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AdapterFollowPeople (
     var dataList: ArrayList<DataFollowPeople> = ArrayList(),
@@ -46,6 +47,8 @@ class AdapterFollowPeople (
     override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
         val binding = holder.binding
         val item = dataList[position]
+
+        // [개선] 팔로워 목록에서 - 이미 팔로잉 상태인 경우 처리
 
         /*
         데이터 셋팅
@@ -91,21 +94,21 @@ class AdapterFollowPeople (
 
                     var From_login_value = ""
                     var To_login_value = ""
-                    var management = ""
+                    var mode = ""
 
                     when (str[which]) {
-                        "삭제" -> {
-                            management = "invisible"
+                        "삭제" -> { // 팔로잉 목록에서 안보이도록 (visibility 변경)
+                            mode = "invisible"
                             From_login_value = item.email
                             To_login_value = email
                         }
                         "팔로잉" -> {
-                            management = "following"
+                            mode = "following"
                             From_login_value = email
                             To_login_value = item.email
                         }
                         "팔로잉 취소" -> {
-                            management = "delete_following"
+                            mode = "delete_following"
                             From_login_value = email
                             To_login_value = item.email
                         }
@@ -113,7 +116,27 @@ class AdapterFollowPeople (
 
                     Log.d("정보태그", "From_login_value=$From_login_value")
                     Log.d("정보태그", "To_login_value=$To_login_value")
-                    Log.d("정보태그", "management=$management")
+                    Log.d("정보태그", "mode=$mode")
+
+
+                    CoroutineScope(Dispatchers.Main).launch  {
+                        val map: MutableMap<String, String> = HashMap()
+                        map["from_email"] = From_login_value
+                        map["to_email"] = To_login_value
+                        map["mode"] = mode
+                        map["from_nickname"] = item.nickname // fcm알람용
+                        val goServer = FunctionCollection.goServer(context,"ManagementFollow",map)
+                        if(goServer){
+                            withContext(Dispatchers.Main) {
+                                if(!mode.equals("following")){
+                                    dataList.removeAt(position)
+                                    notifyItemRemoved(position);
+                                }
+                            }
+                        }
+                    }
+
+
 
 //                    fs.Management_Follow(From_login_value, To_login_value, management) { result ->
 //                        Log.d("실행", "(in Adapter)result=${result.trim()}")

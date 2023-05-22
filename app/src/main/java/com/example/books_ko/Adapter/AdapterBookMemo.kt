@@ -126,8 +126,10 @@ class AdapterBookMemo (
                 val map: MutableMap<String, String> = HashMap()
                 map["from_email"] = email
                 map["to_email"] = item.email
+                map["from_nickname"] = item.nickname // fcm알람용
+                map["mode"] = "following"
                 CoroutineScope(Dispatchers.Main).launch  {
-                    val goServer = fc.goServer(context,"following",map)
+                    val goServer = fc.goServer(context,"ManagementFollow",map)
                     if(goServer){
                         binding.txtFollow.visibility = View.GONE
                         item.follow = 1

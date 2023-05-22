@@ -116,6 +116,7 @@ class Activity_Management_Follow : AppCompatActivity() {
                 if (result?.status == "success"){
                     withContext(Dispatchers.Main) {
                         mainAdapter.dataList = response.body()?.data?.followList as ArrayList<DataFollowPeople>
+                        mainAdapter.mode_follow = sort
                         mainAdapter.notifyDataSetChanged()
 
                         // 명수 셋팅

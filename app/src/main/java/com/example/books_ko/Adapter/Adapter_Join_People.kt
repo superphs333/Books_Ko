@@ -82,8 +82,9 @@ class Adapter_Join_People (
             map["from_email"] = email
             map["from_nickname"] = item.nickname // fcm알람용
             map["to_email"] = item.email
+            map["mode"] = "following"
             CoroutineScope(Dispatchers.Main).launch  {
-                val goServer = fc.goServer(context,"following",map)
+                val goServer = fc.goServer(context,"ManagementFollow",map)
                 if(goServer){
                     binding.txtFollow.visibility = View.GONE
                     item.follow = true
