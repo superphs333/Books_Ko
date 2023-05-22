@@ -82,13 +82,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         var channel_name = ""
         var remoteviews: RemoteViews? = null
         when (sort) {
-//            "For_chatting_room_waiting_list" -> {
-//                intent = Intent(this, Activity_Chatting_Room::class.java)
-//                intent.putExtra("room_idx", map["room_idx"].toString().toInt())
-//                channel_id = getString(R.string.Channel_ID_Chatting_Wating)
-//                channel_name = "모임에 참여"
-//                remoteviews = getCustomDesign(map)
-//            }
+            "For_chatting_room_waiting_list" -> {
+                intent = Intent(this, Activity_Chatting_Room::class.java)
+                intent.putExtra("room_idx", map["room_idx"].toString().toInt())
+                channel_id = getString(R.string.Channel_ID_Chatting_Wating)
+                channel_name = "모임에 참여"
+                remoteviews = getCustomDesign(map)
+            }
             "For_Follow" -> {
                 intent = Intent(this, Activity_Management_Follow::class.java)
                 channel_id = getString(R.string.Channel_ID_Follow)
