@@ -35,6 +35,7 @@ class Activity_Chatting_Room : AppCompatActivity() {
     var total_count = 0
     var join_count = 0
     var email = ""
+    var joinState :Boolean = false
 
     val activity = this
 
@@ -114,6 +115,22 @@ class Activity_Chatting_Room : AppCompatActivity() {
             arrayList = getJoinPeoples()!!
             adapterJoinPeople.dataList = arrayList!!
             adapterJoinPeople.notifyDataSetChanged()
+
+            // joinState 셋팅, [버튼]채팅방 입장 VISIBIITY 설정, [버튼]btnJoin 텍스트 셋팅, join_count값 셋팅
+            // 참여인원 중 내가 포함되어 있으면 -> state=true, btn_join=나가기
+            val isExistingUser = adapterJoinPeople.dataList.any { it.email == email }
+            if (isExistingUser) {
+                binding.btnJoin.text = "나가기"
+                binding.btnEnter.visibility = View.VISIBLE
+                joinState = true
+            } else {
+                binding.btnEnter.visibility = View.GONE
+                binding.btnJoin.text = if (total_count == join_count) "대기하기" else "참여하기"
+                joinState = false
+            }
+            // join_count없데이트
+            binding.txtCount.setText(adapterJoinPeople.dataList.size.toString())
+
         }
 
 
@@ -124,22 +141,23 @@ class Activity_Chatting_Room : AppCompatActivity() {
     fun onClick(view: View) {
         when (view.id) {
             R.id.btn_join -> {
-//                val map: MutableMap<String, String> = HashMap()
-//                map["room_idx"] = room_idx.toString() // 방
-//                map["state"] = state.toString() // 상태(참여중인지 아닌지)
-//                lifecycleScope.launch {
-//                    map["email"] = am.getEmailFromRoom(applicationContext) // 참여자
-//                    val goServer = fc.goServer(applicationContext, "out_join_room",map as MutableMap<String, String>)
-//                    if(goServer){
-//                        Toast.makeText(applicationContext, "리뷰가 변경되었습니다.", Toast.LENGTH_SHORT).show()
-//
-//                        // Intent
+                val map: MutableMap<String, String> = HashMap()
+                map["room_idx"] = room_idx.toString() // 방
+                map["email"] = email
+                map["joinState"] = joinState.toString() // 상태(참여중인지 아닌지)
+                lifecycleScope.launch {
+                    map["email"] = am.getEmailFromRoom(applicationContext) // 참여자
+                    val goServer = fc.goServer(applicationContext, "out_join_room",map as MutableMap<String, String>)
+                    if(goServer){
+                        Toast.makeText(applicationContext, "리뷰가 변경되었습니다.", Toast.LENGTH_SHORT).show()
+
+                        // Intent
 //                        val intent = Intent(applicationContext, ActivityDetailMyBook::class.java)
 //                        intent.putExtra("review", binding.editReview.text.toString())
 //                        setResult(Activity.RESULT_OK, intent)
 //                        finish()
-//                    }
-//                }
+                    }
+                }
             }
             R.id.btn_enter -> {
 //                val  intenttemp = intent(applicationContext, Activity_Chatting::class.java)
