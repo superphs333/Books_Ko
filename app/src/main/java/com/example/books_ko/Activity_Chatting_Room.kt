@@ -112,25 +112,7 @@ class Activity_Chatting_Room : AppCompatActivity() {
 
         lifecycleScope.launch {
             email =am.getEmailFromRoom(applicationContext)
-            arrayList = getJoinPeoples()!!
-            adapterJoinPeople.dataList = arrayList!!
-            adapterJoinPeople.notifyDataSetChanged()
-
-            // joinState 셋팅, [버튼]채팅방 입장 VISIBIITY 설정, [버튼]btnJoin 텍스트 셋팅, join_count값 셋팅
-            // 참여인원 중 내가 포함되어 있으면 -> state=true, btn_join=나가기
-            val isExistingUser = adapterJoinPeople.dataList.any { it.email == email }
-            if (isExistingUser) {
-                binding.btnJoin.text = "나가기"
-                binding.btnEnter.visibility = View.VISIBLE
-                joinState = true
-            } else {
-                binding.btnEnter.visibility = View.GONE
-                binding.btnJoin.text = if (total_count == join_count) "대기하기" else "참여하기"
-                joinState = false
-            }
-            // join_count없데이트
-            binding.txtCount.setText(adapterJoinPeople.dataList.size.toString())
-
+            getJoinPeoples()
         }
 
 
@@ -149,7 +131,8 @@ class Activity_Chatting_Room : AppCompatActivity() {
                     map["email"] = am.getEmailFromRoom(applicationContext) // 참여자
                     val goServer = fc.goServer(applicationContext, "out_join_room",map as MutableMap<String, String>)
                     if(goServer){
-                        Toast.makeText(applicationContext, "리뷰가 변경되었습니다.", Toast.LENGTH_SHORT).show()
+                        getJoinPeoples()
+                        // Toast.makeText(applicationContext, "리뷰가 변경되었습니다.", Toast.LENGTH_SHORT).show()
 
                         // Intent
 //                        val intent = Intent(applicationContext, ActivityDetailMyBook::class.java)
@@ -169,7 +152,7 @@ class Activity_Chatting_Room : AppCompatActivity() {
     }
 
     // 채팅방 참여자 불러오기
-    suspend fun getJoinPeoples(): ArrayList<Data_Join_People>? = withContext(Dispatchers.IO) {
+    suspend fun getJoinPeoples() = withContext(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
             .baseUrl(getString(R.string.server_url))
             .addConverterFactory(GsonConverterFactory.create())
@@ -185,7 +168,28 @@ class Activity_Chatting_Room : AppCompatActivity() {
                     val dataJoinPeopleList =
                         response.body()?.data?.dataJoinPeopleList as ArrayList<Data_Join_People>?
                     Log.i("정보태그","[채팅방 참여 리스트]=>"+dataJoinPeopleList)
-                    dataJoinPeopleList
+
+
+                    lifecycleScope.launch {
+                        adapterJoinPeople.dataList =dataJoinPeopleList!!
+                        adapterJoinPeople.notifyDataSetChanged()
+
+                        // joinState 셋팅, [버튼]채팅방 입장 VISIBIITY 설정, [버튼]btnJoin 텍스트 셋팅, join_count값 셋팅
+                        // 참여인원 중 내가 포함되어 있으면 -> state=true, btn_join=나가기
+                        val isExistingUser = adapterJoinPeople.dataList.any { it.email == email }
+                        if (isExistingUser) {
+                            binding.btnJoin.text = "나가기"
+                            binding.btnEnter.visibility = View.VISIBLE
+                            joinState = true
+                        } else {
+                            binding.btnEnter.visibility = View.GONE
+                            binding.btnJoin.text = if (total_count == join_count) "대기하기" else "참여하기"
+                            joinState = false
+                        }
+                        // join_count없데이트
+                        binding.txtCount.setText(adapterJoinPeople.dataList.size.toString())
+                    }
+
 
 
                 } else {
