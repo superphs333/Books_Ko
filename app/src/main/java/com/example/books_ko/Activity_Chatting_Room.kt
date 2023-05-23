@@ -132,21 +132,14 @@ class Activity_Chatting_Room : AppCompatActivity() {
                     val goServer = fc.goServer(applicationContext, "out_join_room",map as MutableMap<String, String>)
                     if(goServer){
                         getJoinPeoples()
-                        // Toast.makeText(applicationContext, "리뷰가 변경되었습니다.", Toast.LENGTH_SHORT).show()
-
-                        // Intent
-//                        val intent = Intent(applicationContext, ActivityDetailMyBook::class.java)
-//                        intent.putExtra("review", binding.editReview.text.toString())
-//                        setResult(Activity.RESULT_OK, intent)
-//                        finish()
                     }
                 }
             }
             R.id.btn_enter -> {
-//                val  intenttemp = intent(applicationContext, Activity_Chatting::class.java)
-//                intent.putExtra("room_idx", room_idx)
-//                intent.putExtra("title", binding.txtTitle.text.toString())
-//                startActivity(intent)
+                val intent = Intent(applicationContext, Activity_Chatting::class.java)
+                intent.putExtra("room_idx", room_idx)
+                intent.putExtra("title", binding.txtTitle.text.toString())
+                startActivity(intent)
             }
         }
     }

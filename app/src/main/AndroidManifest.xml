@@ -40,6 +40,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".Activity_Chatting"
+            android:exported="false" />
+        <activity
             android:name=".Activity_Edit_Memo"
             android:exported="false" />
         <activity
