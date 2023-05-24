@@ -1,14 +1,20 @@
 package com.example.books_ko
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import android.Manifest
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
@@ -43,6 +49,12 @@ class MainActivity : AppCompatActivity() {
     private var mAuth: FirebaseAuth? = null
     private var rl_google_login: ActivityResultLauncher<Intent>? = null
 
+    /*
+    권한관련
+     */
+    private val CAMERA_PERMISSION_REQUEST_CODE = 1
+    private val STORAGE_PERMISSION_REQUEST_CODE = 2
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         val apiLevel = android.os.Build.VERSION.SDK_INT
         Log.d("정보태그", "API Level: $apiLevel")
 
-
+        requestPermissions()
 
         // 자동로그인 / user데이터베이스에 있는 모든 정보 삭제
         database = Room.databaseBuilder(applicationContext, UserDatabase::class.java, "app_database").build()
@@ -154,6 +166,98 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
+    /*
+    권한을 요청하는 함수
+     카메라 권한과 외부 저장소 권한이 허용되지 않은 경우 해당 권한을 요청
+     */
+    private fun requestPermissions() {
+        val cameraPermission = Manifest.permission.CAMERA
+        val storagePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
+
+        // 권한이 허용되었는지 확인
+        val cameraPermissionGranted = ContextCompat.checkSelfPermission(this, cameraPermission) == PackageManager.PERMISSION_GRANTED
+        val storagePermissionGranted = ContextCompat.checkSelfPermission(this, storagePermission) == PackageManager.PERMISSION_GRANTED
+
+        // 허용되지 않은 권한 목록
+        val permissionsToRequest = ArrayList<String>()
+
+        if (!cameraPermissionGranted) {
+            permissionsToRequest.add(cameraPermission)
+        }
+        if (!storagePermissionGranted) {
+            permissionsToRequest.add(storagePermission)
+        }
+
+        if (permissionsToRequest.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, permissionsToRequest.toTypedArray(), getPermissionRequestCode(permissionsToRequest))
+        }
+    }
+
+    private fun getPermissionRequestCode(permissions: List<String>): Int {
+        // 권한에 따라 요청 코드를 반환하는 함수
+        if (permissions.contains(Manifest.permission.CAMERA) && permissions.contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            return CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE
+        }
+        if (permissions.contains(Manifest.permission.CAMERA)) {
+            return CAMERA_PERMISSION_REQUEST_CODE
+        }
+        if (permissions.contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            return STORAGE_PERMISSION_REQUEST_CODE
+        }
+        return -1 // 기본적으로 -1 또는 다른 값을 반환할 수 있습니다.
+    }
+
+    // 권한 요청 결과를 처리하는 함수
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            CAMERA_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // 카메라 권한이 허용된 경우 처리할 작업 수행
+                    Log.i("정보태그","카메라 권한 허용")
+                } else {
+                    // 카메라 권한이 거부된 경우 처리할 작업 수행
+                    if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                        // 사용자가 "다시 묻지 않음"을 체크한 경우
+                        Log.i("정보태그","카메라 권한 - 사용자가 \"다시 묻지 않음\"을 체크")
+                        openAppSettings()
+                    } else {
+                        // 일반적인 권한 거부 처리
+                        // 사용자에게 권한이 필요하다는 안내 메시지를 표시할 수도 있습니다.
+                    }
+                }
+            }
+            STORAGE_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // 외부 저장소 권한이 허용된 경우 처리할 작업 수행
+                    Log.i("정보태그","외부 저장소 권한 허용")
+                } else {
+                    // 외부 저장소 권한이 거부된 경우 처리할 작업 수행
+                    if (!shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        Log.i("정보태그","외부 저장소 권한 - 사용자가 \"다시 묻지 않음\"을 체크")
+                        // 사용자가 "다시 묻지 않음"을 체크한 경우
+                        openAppSettings()
+                    } else {
+                        // 일반적인 권한 거부 처리
+                        // 사용자에게 권한이 필요하다는 안내 메시지를 표시할 수도 있습니다.
+                    }
+                }
+            }
+        }
+    }
+
+    // 앱 설정 화면으로 이동
+    private fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", packageName, null)
+        intent.data = uri
+        startActivity(intent)
+    }
+
+
+
+
 
     /*
     로그인 버튼 -> 아이디, 비밀번호 확인후
