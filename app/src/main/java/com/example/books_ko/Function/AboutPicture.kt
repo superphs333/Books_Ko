@@ -17,6 +17,8 @@ import java.util.*
 
 object AboutPicture {
 
+
+
     // 카메라에서 사진 가져오기
         // return : 파일 경로
     fun cameraOnePicture(resultLauncher: ActivityResultLauncher<Intent>,context: Context,sort: String): String {
@@ -108,6 +110,8 @@ object AboutPicture {
         }
         return null
     }
+
+
 
     fun isAbsolutePath(path: String): Boolean {
         return path.startsWith("/")
