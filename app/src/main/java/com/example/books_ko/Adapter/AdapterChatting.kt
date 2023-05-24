@@ -2,6 +2,7 @@ package com.example.books_ko.Adapter
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -71,9 +72,9 @@ class AdapterChatting (
         val sort: String = dataList.get(position).sort
         val item = dataList[position]
         return when {
-            item.sort == "notice" -> VIEW_TYPE_NOTICE // 알림
-            item.sort == "message" -> if (item.email == email) VIEW_TYPE_MY_CHAT else VIEW_TYPE_OTHERS_CHAT // 1 : 다른 사람 메세지, 3 : 내 메세지
-            item.sort == "files" -> if (item.email == email) VIEW_TYPE_OTHERS_FILE else VIEW_TYPE_MY_FILE // 2 : 내 이미지 메세지, 4 : 다른 사람 이미지 메세지
+            sort == "notice" -> VIEW_TYPE_NOTICE // 알림
+            sort == "message" -> if (item.email == email) VIEW_TYPE_MY_CHAT else VIEW_TYPE_OTHERS_CHAT // 1 : 다른 사람 메세지, 3 : 내 메세지
+            sort == "files" -> if (item.email == email) VIEW_TYPE_OTHERS_FILE else VIEW_TYPE_MY_FILE // 2 : 내 이미지 메세지, 4 : 다른 사람 이미지 메세지
             else -> throw IllegalArgumentException("Invalid sort: ${item.sort}")
         }
     }
@@ -100,7 +101,8 @@ class AdapterChatting (
             }
             is CustomViewHolderOthersChat -> {
                 val binding = holder.binding
-
+                binding.txtChat.setText(item.content)
+                binding.txtTime.setText(item.date)
             }
             is CustomViewHolderMyFile -> {
                 val binding = holder.binding
@@ -108,7 +110,8 @@ class AdapterChatting (
             }
             is CustomViewHolderMyChat -> {
                 val binding = holder.binding
-
+                binding.txtChat.setText(item.content)
+                binding.txtTime.setText(item.date)
             }
             is CustomViewHolderOthersFile -> {
                 val binding = holder.binding
@@ -118,6 +121,7 @@ class AdapterChatting (
     }
 
     override fun getItemCount(): Int {
+        Log.i("정보태그","[AdapterChatting]count->${dataList.size}")
         return dataList.size
     }
 }

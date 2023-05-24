@@ -136,4 +136,15 @@ interface JsonPlaceHolderApi {
         @Field("sort") sort: String,
     ): retrofit2.Call<ApiResponse<ApiData>>
 
+    /*
+    채팅리스트
+     */
+    @FormUrlEncoded
+    @POST("About_Chatting.php")
+    open fun Get_Chatting(
+        @Field("accept_sort") accept_sort: String,
+        @Field("email") email: String,
+        @Field("room_idx") room_idx: Int,
+        @Field("viewMode") viewMode: Int?,
+    ): retrofit2.Call<ApiResponse<ApiData>>
 }

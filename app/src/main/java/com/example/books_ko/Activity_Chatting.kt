@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.books_ko.Adapter.AdapterChatting
 import com.example.books_ko.Data.DataChatting
+import com.example.books_ko.Function.AboutChatting
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.databinding.ActivityChattingBinding
 import kotlinx.coroutines.CoroutineScope
@@ -63,7 +64,9 @@ class Activity_Chatting : AppCompatActivity() {
             Log.d("정보태그", "[Activity_Chatting]email=$email")
 
             // 리사이클러뷰
-            linearLayoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL,false)
+            linearLayoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL,false)
+                // LinearLayoutManger 방향 중요! (안 나올 수가 있다)
+            arrayList = AboutChatting.getChattingDatas(applicationContext,email,room_idx,0)!!
             mainAdapter = AdapterChatting(arrayList!!, applicationContext, this@Activity_Chatting, email)
             runOnUiThread {
                 binding!!.rvChatting.apply {
@@ -71,9 +74,10 @@ class Activity_Chatting : AppCompatActivity() {
                     layoutManager = linearLayoutManager
                     adapter = mainAdapter
                 }
+                mainAdapter.dataList = arrayList
+                mainAdapter.notifyDataSetChanged()
             }
-//            adapterJoinPeople.dataList =dataJoinPeopleList!!
-//            adapterJoinPeople.notifyDataSetChanged()
+
 
             profile_url = AboutMember.getMemberInfo(applicationContext, email,"profile_url")
             nickname = AboutMember.getMemberInfo(applicationContext, email,"nickname")

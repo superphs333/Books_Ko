@@ -17,5 +17,6 @@ data class ApiData (
     val memoList:ArrayList<Data_Book_Memo>,
     val memoCommentList:ArrayList<Data_Comment_Memo>,
     val followList:ArrayList<DataFollowPeople>,
+    val chattingList:ArrayList<DataChatting>,
         )
 
