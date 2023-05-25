@@ -106,28 +106,13 @@ class Activity_Chatting : AppCompatActivity() {
                         Log.i("정보태그","imageUri->$imageUri")
 
                         // 이미지 절대 경로
-//                        val absolutePath = imageUri?.let { uri ->
-//                            getPathFromUri(uri)
-//                        }
-
-                        // 외부 저장소로 복사
-                        val inputStream = contentResolver.openInputStream(imageUri) // 이미지 파일 읽는다
-                        val timeStamp  = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-                        val randomInt = (0..1000).random()
-                        val imageFileName = "cropppedImg_{$timeStamp}_{$randomInt}"
-                        val outputFile = File(applicationContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "${imageFileName}.jpg") // 외부 저장소에 새 이미지 파일 생성
-                        val outputStream = FileOutputStream(outputFile)
-                        // 이미지 파일 복사
-                        inputStream.use { input ->
-                            outputStream.use { output ->
-                                input?.copyTo(output)
-                            }
+                        val absolutePath = imageUri?.let { uri ->
+                            getPathFromUri(uri)
                         }
-                        val authority = applicationContext.packageName + ".provider"
-                        val fileProviderUri = FileProvider.getUriForFile(applicationContext, authority, outputFile)
-                        Log.i("정보태그","fileProviderUri->$fileProviderUri")
+                        Log.i("정보태그","absolutePath->$absolutePath")
 
-                        img_list.add(fileProviderUri.toString()!!)
+
+                        img_list.add(absolutePath!!)
                     }
                     // 이미지를 서버에 전송하기
                     val filesSender: FilesSender = FilesSender(img_list)

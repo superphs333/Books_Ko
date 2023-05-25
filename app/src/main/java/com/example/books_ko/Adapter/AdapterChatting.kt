@@ -121,7 +121,7 @@ class AdapterChatting (
     }
 
     override fun getItemCount(): Int {
-        Log.i("정보태그","[AdapterChatting]count->${dataList.size}")
+        //Log.i("정보태그","[AdapterChatting]count->${dataList.size}")
         return dataList.size
     }
 }
