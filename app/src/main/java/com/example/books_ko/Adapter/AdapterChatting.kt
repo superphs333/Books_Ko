@@ -4,9 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.books_ko.Data.DataChatting
+import com.example.books_ko.R
 import com.example.books_ko.databinding.ItemBookMemoBinding
 import com.example.books_ko.databinding.ItemChattingMyFileBinding
 import com.example.books_ko.databinding.ItemChattingNoticeBinding
@@ -74,7 +77,7 @@ class AdapterChatting (
         return when {
             sort == "notice" -> VIEW_TYPE_NOTICE // 알림
             sort == "message" -> if (item.email == email) VIEW_TYPE_MY_CHAT else VIEW_TYPE_OTHERS_CHAT // 1 : 다른 사람 메세지, 3 : 내 메세지
-            sort == "files" -> if (item.email == email) VIEW_TYPE_OTHERS_FILE else VIEW_TYPE_MY_FILE // 2 : 내 이미지 메세지, 4 : 다른 사람 이미지 메세지
+            sort == "files" -> if (item.email == email) VIEW_TYPE_MY_FILE else VIEW_TYPE_OTHERS_FILE // 2 : 내 이미지 메세지, 4 : 다른 사람 이미지 메세지
             else -> throw IllegalArgumentException("Invalid sort: ${item.sort}")
         }
     }
@@ -106,6 +109,22 @@ class AdapterChatting (
             }
             is CustomViewHolderMyFile -> {
                 val binding = holder.binding
+                // 이미지
+                val chatImg = context.getString(R.string.server_url_rearNotSlash)+item.content
+                Glide.with(context).load(chatImg).into(binding.imgChat)
+                // 시간
+                binding.txtTime.setText(item.date)
+                /*
+                분류 -> 시간 visible/invisible
+                0,3 -> 시간보임
+                1,2 -> 시간 안보임
+                 */
+                val orderTag = item.orderTag
+                if (orderTag == "0" || orderTag == "3") {
+                    binding.txtTime.visibility = View.VISIBLE
+                } else if (orderTag == "1" || orderTag == "2") {
+                    binding.txtTime.visibility = View.INVISIBLE
+                }
 
             }
             is CustomViewHolderMyChat -> {
@@ -115,6 +134,30 @@ class AdapterChatting (
             }
             is CustomViewHolderOthersFile -> {
                 val binding = holder.binding
+                // 이미지
+                val chatImg = context.getString(R.string.server_url_rearNotSlash)+item.content
+                Glide.with(context).load(chatImg).into(binding.imgChat)
+                // 시간
+                binding.txtTime.setText(item.date)
+                // 썸네일
+                val glideProfileImg = if (item.profileUrl!!.contains(context.getString(R.string.img_profile))) {
+                    context.getString(R.string.server_url_rearNotSlash)+ item.profileUrl
+                } else item.profileUrl
+                Glide.with(context).load(glideProfileImg).into(binding!!.chatThumbnail)
+                // 닉네임
+                binding.txtNickname.setText(item.nickname)
+
+                /*
+                ordertag => 이거에 따라 날짜, 프사, 닉네임이 보이거나/안보이거나
+                0 = file 한개만 있는 경우 -> 날짜 o, 프사 o, 닉네임 o
+                1 = file 여러개, 첫번재 -> 날짜 x, 프사 o, 닉네임 o
+                2 = file 여러개, 중간 -> 날짜 x, 프사 x, 닉네임 x
+                3 = file 여러개, 마지막 -> 날짜 o, 프사 x, 닉네임 x
+                 */
+                val orderTag = item.orderTag
+                binding.txtTime.visibility = if (orderTag == "0" || orderTag == "3") View.VISIBLE else View.INVISIBLE
+                binding.chatThumbnail.visibility = if (orderTag == "0" || orderTag == "1") View.VISIBLE else View.INVISIBLE
+                binding.txtNickname.visibility = if (orderTag == "0") View.VISIBLE else View.INVISIBLE
 
             }
         }

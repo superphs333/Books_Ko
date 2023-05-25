@@ -121,7 +121,7 @@ class Activity_Chatting : AppCompatActivity() {
             }
         }
 
-
+        // [개선] 스크롤
 
         GlobalScope.launch {
             email = AboutMember.getEmailFromRoom(applicationContext)
@@ -132,14 +132,37 @@ class Activity_Chatting : AppCompatActivity() {
                 // LinearLayoutManger 방향 중요! (안 나올 수가 있다)
             arrayList = AboutChatting.getChattingDatas(applicationContext,email,room_idx,0)!!
             mainAdapter = AdapterChatting(arrayList!!, applicationContext, this@Activity_Chatting, email)
+            mainAdapter.dataList = arrayList
+            mainAdapter.notifyDataSetChanged()
             runOnUiThread {
                 binding!!.rvChatting.apply {
                     setHasFixedSize(true)
                     layoutManager = linearLayoutManager
                     adapter = mainAdapter
+
+                    // 스크롤 하단으로 이동
+                    if (mainAdapter.itemCount > 0) {
+                        binding.rvChatting.scrollToPosition(mainAdapter.itemCount - 1)
+                    }
+
+                    addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, oldBottom ->
+                        if (bottom < oldBottom) {
+                            postDelayed({
+                                val itemCount = mainAdapter.itemCount
+                                if (itemCount > 0) {
+                                    smoothScrollToPosition(itemCount - 1)
+                                }
+                            }, 200)
+                        }
+                    }
+
+
+
+
                 }
-                mainAdapter.dataList = arrayList
-                mainAdapter.notifyDataSetChanged()
+
+
+
             }
 
 
@@ -321,8 +344,8 @@ class Activity_Chatting : AppCompatActivity() {
 
                         runOnUiThread {
                             Log.d("정보태그", "어댑터 반영")
-                            binding.rvChatting.scrollToPosition(mainAdapter.itemCount - 1)
                             mainAdapter.notifyDataSetChanged()
+                            binding.rvChatting.scrollToPosition(mainAdapter.itemCount - 1)
                         }
 
                         /*
