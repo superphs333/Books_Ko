@@ -1,5 +1,6 @@
 package com.example.books_ko
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -7,17 +8,20 @@ import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.books_ko.Adapter.AdapterChatting
 import com.example.books_ko.Data.DataChatting
 import com.example.books_ko.Function.AboutChatting
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.Function.AboutPicture
+import com.example.books_ko.Function.FunctionCollection
 import com.example.books_ko.databinding.ActivityChattingBinding
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -353,16 +357,21 @@ class Activity_Chatting : AppCompatActivity() {
                          */
                         // [개선] 서버에서 메세지도 보내고, 알림도 보내는 방향 생각해보기
 
-//                        val map = mapOf(
-//                            "room_idx" to room_idx.toString(),
-//                            "title" to binding.txtTitle.text.toString(),
-//                            "sort" to sort,
-//                            "nickname" to nickname,
-//                            "content" to content,
-//                            "writer" to email,
-//                            "email" to email
-//                        )
-
+                        val map = mapOf(
+                            "room_idx" to room_idx.toString(),
+                            "title" to binding.txtTitle.text.toString(),
+                            "sort" to sort,
+                            "nickname" to nickname,
+                            "content" to content,
+                            "writer" to email,
+                            "email" to email
+                        )
+                        lifecycleScope.launch {
+                            val goServer = FunctionCollection.goServer(applicationContext, "alarm_for_chatting",map as MutableMap<String, String>)
+                            if(goServer){
+                                Log.i("정보태그","알람전송 성공")
+                            }
+                        }
                         //fs.go_server("alarm_for_chatting", map) { result -> }
                     }
                 }

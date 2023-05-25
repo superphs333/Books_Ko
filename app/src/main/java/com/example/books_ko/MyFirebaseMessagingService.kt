@@ -1,14 +1,16 @@
 package com.example.books_ko
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
+import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.work.OneTimeWorkRequest
@@ -17,6 +19,8 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import java.net.HttpURLConnection
+import java.net.URL
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -95,13 +99,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 channel_name = "팔로잉"
                 remoteviews = getCustomDesign(map)
             }
-//            "For_Chatting" -> {
-//                intent = Intent(this, Activity_Chatting::class.java)
-//                intent.putExtra("room_idx", map["room_idx"].toString().toInt())
-//                channel_id = getString(R.string.Channel_ID_Chatting)
-//                channel_name = "채팅"
-//                remoteviews = getCustomDesign_for_Chatting(map)
-//            }
+            "For_Chatting" -> {
+                intent = Intent(this, Activity_Chatting::class.java)
+                intent.putExtra("room_idx", map["room_idx"].toString().toInt())
+                channel_id = getString(R.string.Channel_ID_Chatting)
+                channel_name = "채팅"
+                remoteviews = getCustomDesignForChatting(map)
+            }
             "For_memo_like" -> {
                 intent = Intent(this, Activity_Management_Follow::class.java)
                 channel_id = getString(R.string.Channel_ID_Follow)
@@ -160,6 +164,38 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         remoteViews.setImageViewResource(R.id.noti_icon, R.mipmap.ic_launcher)
         return remoteViews
     }
+
+    private fun getCustomDesignForChatting(map: Map<String, String>): RemoteViews {
+        Log.i("정보태그","[getCustomDesignForChatting]map->"+map)
+        Log.i("정보태그","[getCustomDesignForChatting]packageName->"+applicationContext.packageName)
+        val remoteViews = RemoteViews(applicationContext.packageName, R.layout.noti_for_chatting)
+        remoteViews.setTextViewText(R.id.noti_title, map["title"])
+        remoteViews.setImageViewResource(R.id.noti_icon, R.mipmap.ic_launcher)
+        if("message".equals(map["category"])){
+            remoteViews.setViewVisibility(R.id.noti_message, View.VISIBLE) // 텍스트뷰 보이기
+            remoteViews.setTextViewText(R.id.noti_message, map["message"])
+            remoteViews.setViewVisibility(R.id.for_chatting_img, View.INVISIBLE) // 이미지뷰 안보이기
+        }else if("files".equals(map["category"])){
+            remoteViews.setViewVisibility(R.id.for_chatting_img, View.VISIBLE); // 이미지뷰 보이기
+            remoteViews.setTextViewText(R.id.noti_message,map.get("nickname")+":"); // 텍스트 셋팅
+            /*
+            이미지 셋팅
+             */
+            // url로 부터 비트맵을 받아와서 셋팅한다
+            val url = URL(map["content"] as String)
+            val connection = url.openConnection() as HttpURLConnection
+            connection.doInput = true // 입력 스트림 사용
+            connection.inputStream.use { input -> // 서버로부터 입력 스트림을 얻는다
+                val myBitmap: Bitmap? = BitmapFactory.decodeStream(input) // 서버로부터 데이터를 읽어 비트맵으로 변환
+                remoteViews.setImageViewBitmap(R.id.for_chatting_img, myBitmap)
+            }
+            connection.disconnect() // 연결 닫기
+
+        }
+        return remoteViews
+    }
+
+
 
 
 
