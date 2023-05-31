@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -99,8 +100,30 @@ class FragmentChattingRoom : Fragment() {
             startActivity(intent)
         }
 
+        /*
+        spinner변경시 -> 보여지는 채팅방 다르게
+         */
+        binding!!.spinSort.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, position: Int, l: Long) {
+                Log.i("정보태그", "spinSort onItemSelected, position=>$position")
+
+                lifecycleScope.launch {
+                    arrayList = getChattingRooms()
+                    Log.i("정보태그","arrayList->$arrayList")
+                    adapterMyBook.dataList = arrayList!!
+                    adapterMyBook.notifyDataSetChanged()
+                }
+            }
+            override fun onNothingSelected(adapterView: AdapterView<*>?) {
+                // Nothing to do
+            }
+        }
+
 
         return binding?.root
+
+
+
     }
 
     /*
