@@ -188,11 +188,15 @@ class MainActivity : AppCompatActivity() {
         -> 앱에 필요한 사용자 데이터를 요청하도록 Google로그인을 구성
          */
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail() // 이메일도 사용
+                // GoogleSignInOptions => 구글 로그인에 대한 옵션을 설정하는데 사용됨(사용자 데이터를 요청하고 앱에 필요한 권한을 설정)
+            .requestIdToken(getString(R.string.default_web_client_id)) // 구글 인증을 위한 토큰 요청
+            .requestEmail() // 이메일 정보도 요청하도록 설정함
             .build()
+        // GoogleSignInClient 객체 구성 : 구글 로그인 클라이언트를 나타내는 객체(앱-구글 로그인 서비스사이의 통신을 관리)
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
-        mAuth = FirebaseAuth.getInstance(); // Initialize Firebase Auth
+        // FirebaseAuth객체를 초기화
+            // FirebaseAuth = Firebase인증 서비스를 사용하기 위한 객체(사용자 인증과 관련된 작업을 수행함)
+        mAuth = FirebaseAuth.getInstance();
 
 
         // 로그인 버튼
