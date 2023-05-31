@@ -7,6 +7,16 @@ import androidx.room.Insert
 import androidx.room.Query
 import com.example.books_ko.Data.UserData
 
+// 데이터 액세스 객체(DAO)
+    // Room라이브러리에서 제공하는 인터페이스
+    // 데이터베이스에 접근하여 데이터를 조작하는 메서드를 정의함
+/*
+어노테이션
+@Query : SQL쿼리를 실행하기 위한 어노테이션
+@Insert : 단일 객체 또는 여러 객체를 동시에 삽입할 수 있다
+@Update
+@Delete
+ */
 @Dao
 interface  UserDao {
     @Query("SELECT * FROM user")

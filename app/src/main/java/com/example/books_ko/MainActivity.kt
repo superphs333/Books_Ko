@@ -144,7 +144,12 @@ class MainActivity : AppCompatActivity() {
 
         // 자동로그인 / user데이터베이스에 있는 모든 정보 삭제
         database = Room.databaseBuilder(applicationContext, UserDatabase::class.java, "app_database").build()
+            // app_database라는 이름을 가지는 Room데이터베이스를 생성하고 인스턴스를 databse변수에 저장
+            // build() -> 설정된 옵션에 따라 데이터베이스 인스턴스를 생성함
         val userLiveData = database.userDao().getUser()
+            // 사용자를 비동기적으로 가져온다
+        // userLiveData를 관찰하는데, user라는 변수를 통해 관찰된 데이터베이스를 받는다
+            // Observer의 람다 식({ user -> ... }) 내에서 데이터가 변경될 때 수행할 동작을 정의
         userLiveData.observe(this, Observer { user ->
             if (user != null) {
                 // 데이터가 있다면 정보 출력
@@ -203,6 +208,8 @@ class MainActivity : AppCompatActivity() {
         binding.signInButton.setOnClickListener {
             Log.i("정보태그", "(button)login_google")
             val intent = mGoogleSignInClient!!.signInIntent
+                // mGoogleSignInClient 객체의 signInIntent를 사용하여 로그인 인텐트(intent)를 가져온다
+                    // signInIntent = 구글 로그인 작업을 위한 인텐트 객체
             rl_google_login!!.launch(intent)
         }
         // 로그인 후 로직 : 사용자가 로그인 한 후 활동 -> 사용자에 대한 GoogleSingInAccount 개체를 가져올 수 있다
@@ -213,6 +220,7 @@ class MainActivity : AppCompatActivity() {
                 val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
                     // GoogleSignInAccount객체는 사용자 이름과 같이 로그인 한 사용자에 대한 정보가 포함된다
                 try {
+                    // GoogleSignInAccount 객체를 얻는다 -> 로그인 한 사용자에 대한 정보가 포함되어 있음
                     val account = task.getResult(ApiException::class.java)
                     /*
                     사용자가 정상적으로 로그인하면, GoogleSignInAccount객체에서 id토큰을
