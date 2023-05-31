@@ -67,6 +67,8 @@ class Activity_Main2 : AppCompatActivity() {
         // 프래그먼트 트랜잭션 시작 : 프래그먼트 트랜잭션, 백스택, 애니메이션 등을 설정함
         fragmentTransaction = fragmentManager!!.beginTransaction()
         fragmentTransaction!!.replace(R.id.frameLayout, fragment_books!!).commitAllowingStateLoss()
+
+
     }
 
     // 각 버튼을 클릭하면 해당 프래그먼트들이 보인다

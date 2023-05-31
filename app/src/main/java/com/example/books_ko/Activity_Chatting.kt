@@ -41,6 +41,8 @@ import java.util.*
 
 class Activity_Chatting : AppCompatActivity() {
 
+    //[ 개선 ] 전반적으로 필요
+
     private lateinit var binding : ActivityChattingBinding
 
     var room_idx = 0
