@@ -299,14 +299,18 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent);
     }
 
+
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount){
         Log.d("정보태그", "firebaseAuthWithGoogle:" + acct.id)
+        // Firebase인증에 필요한 credential 만들기
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
-        mAuth!!.signInWithCredential(credential)
+        mAuth!!.signInWithCredential(credential) // mAuth = FirebaseAuth
+                // signInWithCredential -> 비동기적으로 작동하며, 완료시엔느 addOnCompleteListener
+                // 에 정의된 콜백 함수를 호출함
             .addOnCompleteListener(
                 this
             ) { task ->
-                if (task.isSuccessful) {
+                if (task.isSuccessful) { // 성공
                     // signInWithCredential에 대한 호출이 성공하면,
                     // getCurrentUser메서드로 사용자의 계정 데이터를 가져 올 수 있다.
                     Log.i("정보태그", "signInWithCredential:success")
