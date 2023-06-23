@@ -286,7 +286,7 @@ class Activity_Signup : AppCompatActivity() {
             if (result.resultCode == RESULT_OK) {
                 // 이미지 크롭하기
                 val imageUri = result.data!!.data!!
-                val outputUri = Uri.fromFile(File(applicationContext.cacheDir, "cropped_image.jpg"))
+                val outputUri = Uri.fromFile(File(applicationContext.cacheDir, "cropped_image.jpg")) // 개선 : 캐시 디렉토리가 아닌 카메라 처럼 임시파일생성하고 FileProvider통해 파일의 uri값 반환 받기 해보자
                 var cropIntent2 = UCrop.of(imageUri, outputUri)
                     .withAspectRatio(1f, 1f) // 사각형 비율을 사용하려면 이 줄을 삭제하거나 주석 처리하세요.
                     .getIntent(applicationContext)
