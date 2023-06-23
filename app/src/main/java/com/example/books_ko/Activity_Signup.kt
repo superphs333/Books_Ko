@@ -71,7 +71,7 @@ class Activity_Signup : AppCompatActivity() {
     var email_no_double = false; // 이메일 중복 체크 여부
     var temp_email_not_duplication = ""; //  중복 확인 체크한(중복이 아닌) 이메일
 
-    var nick_no_double = false;
+    var nickNoDouble = false;
 
 
     /*
@@ -196,16 +196,16 @@ class Activity_Signup : AppCompatActivity() {
         닉네임 입력칸에 입력값이 있을 경우 -> 중복 확인을 다시 해줘야 함
          */
         binding.editNick.addTextChangedListener(object : TextWatcher {
-            var before_nick = binding.editNick.text.toString()
+            val before_nick = binding.editNick.text.toString()
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
             override fun afterTextChanged(editable: Editable) {
-                if (nick_no_double == true) { // 중복확인 체크가 끝난경우
+                if (nickNoDouble == true) { // 중복확인 체크가 끝난경우
                     // 만약 이전 닉네임과 같은 경우가 아니라면 nick_no_double=false
                     // + txt_nick_info 변경
                     if (!binding.editNick.equals(before_nick)) {
                         binding.txtNickInfo.text = "중복확인 문구"
-                        nick_no_double = false
+                        nickNoDouble = false
                     }
                 }
             }
@@ -218,6 +218,7 @@ class Activity_Signup : AppCompatActivity() {
             if (result.resultCode == Activity.RESULT_OK) {
 
                 var resultUri = result.data?.let { UCrop.getOutput(it) };
+                    // Ucrop.getOutput(it) : 이미지를 크롭한 후 얻은 결과 Uri반환
                 Log.i("정보태그","(크롭후)resultUri->"+resultUri)
 
                 // 이미지 URI가 캐시 디렉토리를 참조하는 경우 외부 저장소로 복사
@@ -409,10 +410,10 @@ class Activity_Signup : AppCompatActivity() {
             override fun onSuccess(result: Boolean) {
                 Log.i("정보태그", "(닉네임)chk_double vollycallback=>$result")
                 if (result) { // 중복 o
-                    nick_no_double = false
+                    nickNoDouble = false
                     binding.txtNickInfo.text = "사용 불가능한 닉네임입니다"
                 } else { // 중복x
-                    nick_no_double = true
+                    nickNoDouble = true
                     binding.txtNickInfo.text = "사용 가능한 닉네임입니다"
                 }
             }
@@ -506,7 +507,7 @@ class Activity_Signup : AppCompatActivity() {
             }
 
             // 닉네임
-            !nick_no_double -> {
+            !nickNoDouble -> {
                 Toast.makeText(
                     applicationContext,
                     "닉네임을 확인해주세요",

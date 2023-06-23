@@ -29,12 +29,12 @@ object AboutPicture {
             // 1. 임의의 경로에 파일 만들기
             var photo_File: File? = null
             try{
-                photo_File = createImageFile(context,sort);
+                photo_File = createImageFile(context);
             }catch (e:Exception){
                 e.printStackTrace()
                 Log.d("정보태그", "createImageFile 오류=>" + e.message)
             }
-            // 2. FileProvider를 통해서 파일의 uri값을 만든다(이런식으로 했을 때 onActivity도달 가능)
+            // 2. FileProvider를 통해서 파일의 uri값을 만든다(Ucrop라이브러리에서 접근 할 수 있도록)
             if(photo_File!=null){
                 val authority = context.packageName + ".provider"
                 val photoUri = FileProvider.getUriForFile(context,authority,photo_File)
@@ -62,7 +62,7 @@ object AboutPicture {
     임시파일 변환하기
      */
     @Throws(IOException::class)
-    fun createImageFile(context: Context,sort: String): File {
+    fun createImageFile(context: Context): File {
         // 1. String prefix 부분
         val timeStamp  = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val imageFileName = "createImageFile_{$timeStamp}_"
