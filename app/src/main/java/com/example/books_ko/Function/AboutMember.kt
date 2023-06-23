@@ -55,8 +55,8 @@ object AboutMember{
     함수
      */
     // 정규식
-    open fun chk_regex(sort: String?, input_email: EditText?): Boolean{
-        val text = input_email!!.text.toString()
+    open fun chk_regex(sort: String?, inputText: EditText?): Boolean{
+        val text = inputText!!.text.toString()
         var regex ="";
         Log.i("정보태그", "분류=>$sort, text=>$text")
         // sort에 따라 정규식 분류
