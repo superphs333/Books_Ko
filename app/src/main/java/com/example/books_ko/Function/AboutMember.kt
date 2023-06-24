@@ -80,7 +80,7 @@ object AboutMember{
     }
 
     // 닉네임, 이메일 중복 체크
-    open fun chk_double(sort: String?, input: EditText?, callback: VolleyCallback?,from : String?=""){
+    open fun chkDouble(sort: String?, input: EditText?, callback: VolleyCallback?, from : String?=""){
         Log.i("정보태그", "function chk_double")
         val chk_double_result = booleanArrayOf(false)
 
@@ -161,7 +161,7 @@ object AboutMember{
         appHelper.requestQueue!!.add(request)
     }
 
-    open fun chk_login(activity: LifecycleOwner, email: EditText?, pw: EditText?, auto_login: Boolean){
+    open fun chkLogin(email: EditText?, pw: EditText?, auto_login: Boolean){
         // 웹페이지 실행하기
         val url = email?.context?.getString(R.string.server_url)+"About_Member.php";
         val request: StringRequest = object : StringRequest(
@@ -320,7 +320,7 @@ object AboutMember{
     /*
     구글 - 신규회원인지, 기존회원인지 분류
      */
-    fun validate_new(activity: LifecycleOwner,context : Context,sns_id: String, profile_url: String, login_email: String) {
+    fun validateNew(context : Context, sns_id: String, profile_url: String, login_email: String) {
         val url = context.getString(R.string.server_url)+"About_Member.php";
         val request: StringRequest = object : StringRequest(
             Method.POST,
@@ -399,7 +399,7 @@ object AboutMember{
         appHelper.requestQueue!!.add(request)
     }
 
-     fun google_sign_up(activity: LifecycleOwner,context: Context,email: String, sns_id: String, nickname: String, profile_url: String) {
+     fun google_sign_up(context: Context,email: String, sns_id: String, nickname: String, profile_url: String) {
         val url = context.getString(R.string.server_url)+"About_Member.php";
         val request: StringRequest = object : StringRequest(
             Method.POST,
@@ -475,7 +475,7 @@ object AboutMember{
         appHelper.requestQueue!!.add(request)
     }
 
-   fun Change_Member_Info(context: Context,activity:LifecycleOwner,sort: String, input: String, email: String) {
+   fun changeMemberInfo(context: Context, activity:LifecycleOwner, sort: String, input: String, email: String) {
        val url = context.getString(R.string.server_url)+"About_Member.php";
        val request: StringRequest = object : StringRequest(
            Method.POST,

@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.books_ko.Function.AboutMember
-import com.example.books_ko.Function.AboutMember.Change_Member_Info
 import com.example.books_ko.databinding.ActivityChangePwBinding
 
 class Activity_Change_Pw : AppCompatActivity() {
@@ -98,7 +97,7 @@ class Activity_Change_Pw : AppCompatActivity() {
         }
 
         // 비밀번호 변경
-        am.Change_Member_Info(applicationContext,activity,"pw", binding.editPw.text.toString(), email)
+        am.changeMemberInfo(applicationContext,activity,"pw", binding.editPw.text.toString(), email)
     }
 
 

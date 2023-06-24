@@ -1,6 +1,5 @@
 package com.example.books_ko
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -47,7 +46,7 @@ class Activity_Find_Pw : AppCompatActivity() {
             return
         }
         // 존재하는 이메일인지 확인
-        am.chk_double("email", binding.editEmail, object : AboutMember.VolleyCallback {
+        am.chkDouble("email", binding.editEmail, object : AboutMember.VolleyCallback {
             override fun onSuccess(result: Boolean) {
                 Log.i("정보태그", "chk_double vollycallback=>$result")
                 var set_validate_email = false

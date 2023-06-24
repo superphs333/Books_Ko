@@ -68,8 +68,8 @@ class Activity_Signup : AppCompatActivity() {
      */
     var gMailSender: GMailSender? = null // 이메일 보내는 객체
     var temp_email_string = ""; // 이메일 인증 문자
-    var email_no_double = false; // 이메일 중복 체크 여부
-    var temp_email_not_duplication = ""; //  중복 확인 체크한(중복이 아닌) 이메일
+    var emailNoDouble = false; // 이메일 중복 체크 여부
+    var tempEmailNotDuplication = ""; //  중복 확인 체크한(중복이 아닌) 이메일
 
     var nickNoDouble = false;
 
@@ -320,16 +320,16 @@ class Activity_Signup : AppCompatActivity() {
         /*
         이메일 중복 여부 확인
          */
-        am.chk_double("email", binding.editEmail, object : AboutMember.VolleyCallback {
+        am.chkDouble("email", binding.editEmail, object : AboutMember.VolleyCallback {
             override fun onSuccess(result: Boolean) {
                 Log.i("정보태그", "chk_double vollycallback=>$result")
 
                 // 중복이 아닌 경우에만 이메일 전송
                 if (!result) {
                     // 중복 확인 여부 셋팅
-                    email_no_double = true;
+                    emailNoDouble = true;
                     // 인증된 이메일 셋팅
-                    temp_email_not_duplication = binding.editEmail.text.toString();
+                    tempEmailNotDuplication = binding.editEmail.text.toString();
 
 
                     /*
@@ -406,7 +406,7 @@ class Activity_Signup : AppCompatActivity() {
         }
 
         // 닉네임 중복 확인
-        am.chk_double("nickname", binding.editNick, object : AboutMember.VolleyCallback {
+        am.chkDouble("nickname", binding.editNick, object : AboutMember.VolleyCallback {
             override fun onSuccess(result: Boolean) {
                 Log.i("정보태그", "(닉네임)chk_double vollycallback=>$result")
                 if (result) { // 중복 o
@@ -467,7 +467,7 @@ class Activity_Signup : AppCompatActivity() {
          */
         when {
             // 이메일 중복 확인
-            !email_no_double -> {
+            !emailNoDouble -> {
                 Toast.makeText(
                     applicationContext,
                     "이메일 중복체크를 확인해주세요",
@@ -535,6 +535,12 @@ class Activity_Signup : AppCompatActivity() {
         val profileImageFile = File(filePath.absolutePath) // 이미지 파일 객체를 생성합니다.
         val profileImage = profileImageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
         val profileImagePart = MultipartBody.Part.createFormData("uploadedfile", profileImageFile.name, profileImage)
+            /*
+            MultipartBody.Part.createFormData(String name, String value, RequestBody body)
+                - name : 요청에서 해당 파트의 일믕르 나타내는 문자열
+                - value : 파트의 값으로 사용할 문자열
+                - body : 파트의 내용을 나타내는 RequestBody객체 (보통 파일 업로드 시에는 파일의 내용을 담은 RequestBody가 사용됨)
+             */
         myApi.sendDatatoSignUp(accept_sort,email, password, nickname, profileImagePart).enqueue(object :
             Callback<ApiResponse<ApiData>> {
             override fun onResponse(call: Call<ApiResponse<ApiData>>, response: Response<ApiResponse<ApiData>>) {

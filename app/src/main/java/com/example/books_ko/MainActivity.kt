@@ -27,11 +27,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -280,8 +278,7 @@ class MainActivity : AppCompatActivity() {
         /*
         로그인 정보 있는지 확인
          */
-        am.chk_login(
-            actvity,
+        am.chkLogin(
             binding.editEmail,
             binding.editPw,
             binding.chkAutologin.isChecked
@@ -342,7 +339,7 @@ class MainActivity : AppCompatActivity() {
                         Log.d("정보태그", "emailVerified=$emailVerified")
                         if(emailVerified){
                             // 신규회원인지 이미 회원가입한 회원인지를 분기한다 -> 그 후 처리는 아래 함수에서
-                            am.validate_new(actvity,applicationContext,user.uid, profile_url,
+                            am.validateNew(applicationContext,user.uid, profile_url,
                                 login_email!!
                             )
                         }else{

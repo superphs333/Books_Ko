@@ -6,7 +6,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.lifecycleScope
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.databinding.ActivityMain2Binding
 import com.google.android.gms.tasks.OnCompleteListener
@@ -52,7 +51,7 @@ class Activity_Main2 : AppCompatActivity() {
                 GlobalScope.launch {
                     email = AboutMember.getEmailFromRoom(applicationContext)
                     Log.i("정보태그","(AboutMember.getEmailFromRoom로 가져온)email->$email")
-                    am.Change_Member_Info(applicationContext,this@Activity_Main2,"sender_id", token, email)
+                    am.changeMemberInfo(applicationContext,this@Activity_Main2,"sender_id", token, email)
                 }
 
             })

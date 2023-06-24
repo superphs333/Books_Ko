@@ -120,9 +120,9 @@ class Activity_Set_nickname : AppCompatActivity() {
             return
         }
         if (why_change == "signup") { // 회원가입
-            am.google_sign_up(activity,applicationContext,login_email, sns_id, binding.editNick.text.toString(), profile_url)
+            am.google_sign_up(applicationContext,login_email, sns_id, binding.editNick.text.toString(), profile_url)
         } else if (why_change == "only_change") { // 닉네임변경
-            AboutMember.Change_Member_Info(applicationContext,this@Activity_Set_nickname,"nickname",binding.editNick.text.toString(),
+            AboutMember.changeMemberInfo(applicationContext,this@Activity_Set_nickname,"nickname",binding.editNick.text.toString(),
                 login_email)
         }
     }
@@ -149,7 +149,7 @@ class Activity_Set_nickname : AppCompatActivity() {
         }
 
         // 닉네임 중복 확인
-        am.chk_double("nickname", binding.editNick, object : AboutMember.VolleyCallback {
+        am.chkDouble("nickname", binding.editNick, object : AboutMember.VolleyCallback {
             override fun onSuccess(result: Boolean) {
                 Log.i("정보태그", "(닉네임)chk_double vollycallback=>$result")
                 if (result) { // 중복 o
