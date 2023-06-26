@@ -1,4 +1,4 @@
-package com.example.books_ko
+package com.example.books_ko.Data
 
 data class ApiResponse<T>(
     // <T> :  서버 응답에서 실제 데이터를 나타내는 클래스

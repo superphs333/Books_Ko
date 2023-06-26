@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.books_ko.Class.GMailSender
 import com.example.books_ko.Data.ApiData
+import com.example.books_ko.Data.ApiResponse
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.Function.AboutPicture
 import com.example.books_ko.Interface.JsonPlaceHolderApi

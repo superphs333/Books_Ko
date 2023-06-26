@@ -12,9 +12,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.books_ko.Activity_PopUp_in_Search_Book
-import com.example.books_ko.ApiResponse
 import com.example.books_ko.Class.AppHelper
-import com.example.books_ko.Data.ApiData
 import com.example.books_ko.Data.DataMyBook
 import com.example.books_ko.DataBase.UserDatabase
 import com.example.books_ko.Interface.JsonPlaceHolderApi
@@ -25,8 +23,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException

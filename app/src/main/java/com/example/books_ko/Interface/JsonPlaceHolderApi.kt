@@ -1,10 +1,9 @@
 package com.example.books_ko.Interface
 
-import com.example.books_ko.ApiResponse
+import com.example.books_ko.Data.ApiResponse
 import com.example.books_ko.Data.ApiData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Multipart

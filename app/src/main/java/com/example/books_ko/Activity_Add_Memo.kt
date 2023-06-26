@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.ItemTouchHelperCallback
 import com.example.books_ko.Adapter.Adapter_Img_Memo
 import com.example.books_ko.Data.ApiData
+import com.example.books_ko.Data.ApiResponse
 import com.example.books_ko.Data.Data_Img_Memo
 import com.example.books_ko.Function.AboutMember
 import com.example.books_ko.Function.AboutMemo.getOneMemo
@@ -33,7 +34,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
