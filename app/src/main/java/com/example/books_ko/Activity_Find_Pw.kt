@@ -51,7 +51,7 @@ class Activity_Find_Pw : AppCompatActivity() {
                 Log.i("정보태그", "chk_double vollycallback=>$result")
                 var set_validate_email = false
 
-                // 중복이 아닌 경우에만 이메일 전송
+
                 if (result) {
                     Log.i("정보태그", "존재하는 이메일")
                     /*

@@ -180,6 +180,10 @@ object AboutMember{
                 val result: String = jsonElement.getAsJsonObject().get("result").getAsString()
                 Log.i("정보태그","result=>"+result);
 
+                /*
+                개선 : FunctionCollection에 있는 함수로 처리하기
+                 */
+
                 if(result.equals("yes")){ // 로그인 정보 존재
                     Toast.makeText(
                         email?.context,
@@ -240,8 +244,8 @@ object AboutMember{
                 val params: MutableMap<String, String> = HashMap()
                 Log.i("정보태그", "")
                 params["accept_sort"] = "login"
-                params["email"] = email!!.text.toString() // nickname or email
-                params["pw"] = pw!!.text.toString() // nickname or email
+                params["email"] = email!!.text.toString()
+                params["pw"] = pw!!.text.toString()
                 return params
             }
         }

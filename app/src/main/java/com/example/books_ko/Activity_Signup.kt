@@ -563,6 +563,10 @@ class Activity_Signup : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
 
+                    /*
+                    개선 : 실패 원인 받아와서 toast메세지로 전달해주기
+                     */
+
                 }
             }
 

@@ -70,6 +70,7 @@ class Fragment_Books : Fragment(), View.OnClickListener {
              */
             linearLayoutManager = LinearLayoutManager(context)
             adapterMyBook = AdapterMyBook(arrayList!!, context, activity)
+            adapterMyBook.email = email
             binding!!.rvMyBooks.apply {
                 setHasFixedSize(true)
                 layoutManager = linearLayoutManager

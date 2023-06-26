@@ -29,6 +29,7 @@ class AdapterMyBook (
 
     lateinit var binding : ItemBookListBinding
     val fc = FunctionCollection
+    var email = ""
 
     inner class CustomViewHolder(val binding: ItemBookListBinding) : RecyclerView.ViewHolder(binding.root){
         fun getAbsoluteAdapterPosition(): Int {
@@ -110,6 +111,7 @@ class AdapterMyBook (
                                 Log.d("정보태그", "예 누름")
                                 val map: MutableMap<String, String> = HashMap()
                                 map.put("book_idx", item.idx.toString())
+                                map.put("email",  email)
                                 val job = CoroutineScope(Dispatchers.Main).launch {
                                     val isSuccess = fc.goServer(context, "delete_my_book", map)
                                     // 결과 처리

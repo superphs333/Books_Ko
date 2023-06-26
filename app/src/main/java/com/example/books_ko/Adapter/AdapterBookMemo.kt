@@ -16,7 +16,6 @@ import com.example.books_ko.Activity_Add_Memo
 import com.example.books_ko.Data.Data_Book_Memo
 import com.example.books_ko.Data.SliderItem
 import com.example.books_ko.Function.FunctionCollection
-import com.example.books_ko.Function.SliderAdapterT1
 import com.example.books_ko.R
 import com.example.books_ko.databinding.ItemBookMemoBinding
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType
